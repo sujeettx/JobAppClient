@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import Header from './Components/Header';
 import Footer from './Components/Fotter';
 import HomePage from './Components/HomePage';
-import Signup from './Components/SignUpPage';
+import Auth from './Components/AuthPage';
 import NotFoundPage from './Components/NotFound';
 import PostJob from './Components/PostJob'
 
@@ -24,8 +24,8 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           {/* Add more routes here */}
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={< Signup/>} />
+          <Route path="/signup" element={<Auth />} />
+          <Route path="/login" element={< Auth/>} />
           <Route path="/post-job" element={<PostJob />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
