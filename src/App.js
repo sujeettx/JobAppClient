@@ -7,6 +7,7 @@ import HomePage from './Components/HomePage';
 import Auth from './Components/AuthPage';
 import NotFoundPage from './Components/NotFound';
 import PostJob from './Components/PostJob'
+import FindJobs from './Components/FindJobs';
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/signup" element={<Auth />} />
           <Route path="/login" element={< Auth/>} />
           <Route path="/post-job" element={<PostJob />} />
+          <Route path="/find-jobs" element={<FindJobs />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Footer />

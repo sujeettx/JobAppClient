@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, IconButton } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
@@ -9,9 +8,8 @@ import GroupIcon from '@mui/icons-material/Group';
 import LockIcon from '@mui/icons-material/Lock';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import axios from 'axios'; // Import Axios
+import axios from 'axios';
 
-// Reuse the styles from the main component
 const styles = {
   textField: {
     '& .MuiOutlinedInput-root': {
@@ -40,41 +38,40 @@ const styles = {
 };
 
 const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
-  // State for form inputs
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     name: '',
-    phoneNumber: '',
     company_name: '',
-    company_email: '',
+    Company_email: '',
+    phoneNumber: '',
     employee_size: '',
-    password: '',
-  });
+    password: ''
+  };
 
-  // State for feedback messages
+  const [formData, setFormData] = useState(initialFormState);
   const [message, setMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
 
-    // Ensure employee_size is converted to an integer
     const dataToSend = {
       ...formData,
-      employee_size: parseInt(formData.employee_size), // Parse employee size to ensure it's a number
+      employee_size: parseInt(formData.employee_size),
     };
 
     try {
       const response = await axios.post('http://localhost:5000/company/register', dataToSend);
-      setMessage('Registration successful!'); // Success message
-      console.log(response.data); // Handle the response data as needed
+      setMessage('Registration successful!');
+      setIsSuccess(true);
+      setFormData(initialFormState); // Clear the form
+      console.log(response.data);
     } catch (error) {
-      // Enhanced error handling
+      setIsSuccess(false);
       if (error.response) {
         console.error("Error data:", error.response.data);
         console.error("Error status:", error.response.status);
@@ -137,8 +134,8 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
         variant="outlined"
         margin="dense"
         sx={styles.textField}
-        name="company_email"
-        value={formData.company_email}
+        name="Company_email"
+        value={formData.Company_email}
         onChange={handleChange}
         InputProps={{
           startAdornment: <EmailIcon sx={{ mr: 1, color: '#3b82f6' }} />,
@@ -180,7 +177,7 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
       />
       <Button
         fullWidth
-        type="submit" // Change this to submit
+        type="submit"
         variant="contained"
         sx={styles.submitButton}
       >
@@ -188,7 +185,7 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
       </Button>
 
       {message && (
-        <Typography variant="body2" sx={{ mt: 2, textAlign: 'center', color: '#ff0000' }}>
+        <Typography variant="body2" sx={{ mt: 2, textAlign: 'center', color: isSuccess ? '#22c55e' : '#ff0000' }}>
           {message}
         </Typography>
       )}
