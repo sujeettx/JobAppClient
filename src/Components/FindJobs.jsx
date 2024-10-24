@@ -21,10 +21,8 @@ const StyledContainer = styled(Container)(({ theme }) => ({
 
 const SearchBox = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(4),
-  padding: theme.spacing(3),
   background: theme.palette.background.paper,
   borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[1],
 }));
 
 const FindJobs = () => {

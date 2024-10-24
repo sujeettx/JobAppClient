@@ -24,11 +24,11 @@ const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: theme.shadows[8],
-  },
+  // transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+  // '&:hover': {
+  //   transform: 'translateY(-8px)',
+  //   boxShadow: theme.shadows[8],
+  // },
   position: 'relative',
   overflow: 'visible',
   '&::before': {
