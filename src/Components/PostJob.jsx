@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Add, Send, Visibility } from '@mui/icons-material';
@@ -24,7 +24,7 @@ const JobPostingPage = () => {
       display: 'flex',
       flexDirection: isSmallScreen ? 'column' : 'row',
       padding: '10px',
-      maxHeight: '110vh',
+      maxHeight: '75vh',
     },
     sidebar: {
       width: isSmallScreen ? '100%' : '250px',
@@ -38,11 +38,12 @@ const JobPostingPage = () => {
       padding: '20px',
       display: 'flex',
       justifyContent: 'center',
-      alignItems: 'center',
+      alignItems: 'flex-start', // Changed to flex-start to avoid stretching
+      overflowY: 'auto', // Added scroll for overflow
     },
     card: {
       width: '100%',
-      maxWidth: isSmallScreen ? '100%' : '600px',
+      maxWidth: isSmallScreen ? '100%' : '800px', // Increased max width
       position: 'relative',
     },
     closeButton: {
@@ -60,31 +61,35 @@ const JobPostingPage = () => {
       flexDirection: 'column',
       gap: '10px',
     },
-    chipContainer: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '8px',
-      marginTop: '8px',
-    },
-    candidateInput: {
-      display: 'flex',
-      gap: '8px',
-    },
     list: {
       width: '100%',
-      maxWidth: '600px',
       backgroundColor: theme.palette.background.paper,
+      maxHeight: '0vh', // Added max height
+      overflowY: 'auto', // Added scroll
     },
   };
+
+  // Fetch jobs when component mounts or activeForm changes to 'viewJobs'
+  useEffect(() => {
+    if (activeForm === 'viewJobs') {
+      fetchPostedJobs();
+    }
+  }, [activeForm]);
 
   const fetchPostedJobs = async () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get('https://your-api-endpoint.com/jobs');
+      const response = await axios.get('http://localhost:5000/jobs/all', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Fetched jobs:', response.data);
       setJobs(response.data);
     } catch (err) {
-      setError('Failed to fetch jobs. Please try again.');
+      console.error('Error fetching jobs:', err);
+      setError(`Failed to fetch jobs: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -104,6 +109,7 @@ const JobPostingPage = () => {
             error={error}
             onClose={() => setActiveForm('')}
             styles={styles}
+            onRefresh={fetchPostedJobs} // Added refresh capability
           />
         );
       default:
@@ -121,6 +127,7 @@ const JobPostingPage = () => {
             color="primary"
             startIcon={<Add />}
             onClick={() => setActiveForm('postJob')}
+            fullWidth
           >
             Post Job
           </Button>
@@ -130,6 +137,7 @@ const JobPostingPage = () => {
             color="primary"
             startIcon={<Send />}
             onClick={() => setActiveForm('sendJobAlert')}
+            fullWidth
           >
             Send Job Alert
           </Button>
@@ -138,10 +146,8 @@ const JobPostingPage = () => {
             variant="contained"
             color="primary"
             startIcon={<Visibility />}
-            onClick={() => {
-              setActiveForm('viewJobs');
-              fetchPostedJobs();
-            }}
+            onClick={() => setActiveForm('viewJobs')}
+            fullWidth
           >
             View Posted Jobs
           </Button>

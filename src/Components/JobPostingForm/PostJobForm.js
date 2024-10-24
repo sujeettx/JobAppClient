@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -13,51 +13,150 @@ import {
   IconButton,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const PostJobForm = ({ onClose, styles }) => {
-  const [formData, setFormData] = React.useState({
+const PostJobForm = ({ onClose, styles = {} }) => {
+  const defaultStyles = {
+    card: {
+      maxWidth: 600,
+      margin: '0 auto',
+      position: 'relative',
+      padding: 2,
+    },
+    closeButton: {
+      position: 'absolute',
+      right: 8,
+      top: 8,
+    },
+    form: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 2,
+      marginTop: 2,
+    },
+  };
+
+  const [formData, setFormData] = useState({
     title: '',
     description: '',
     experienceLevel: '',
     location: '',
-    endDate: '',
+    salary: '',
+    deadlineDate: '', // Match backend field name "deadlineDate"
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Handle form field changes
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-    onClose();
+  // Validate form fields
+  const validateForm = () => {
+    if (!formData.title.trim()) return 'Job title is required';
+    if (!formData.description.trim()) return 'Job description is required';
+    if (!formData.experienceLevel) return 'Experience level is required';
+    if (!formData.location.trim()) return 'Location is required';
+    if (!formData.salary || isNaN(Number(formData.salary))) return 'Valid salary is required';
+    if (!formData.deadlineDate) return 'Deadline date is required';
+    return null;
   };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationError = validateForm();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+  
+    setLoading(true);
+    setError('');
+  
+    try {
+      const postData = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        experienceLevel: formData.experienceLevel,
+        location: formData.location.trim(),
+        salary: Number(formData.salary),
+        DeadlineDate: new Date(formData.deadlineDate).toISOString(),
+      };
+  
+      const response = await fetch('http://localhost:5000/jobs/post', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
+  
+      if (response.ok) {
+        // const data = await response.json();
+        toast.success('Job posted successfully!'); // Success message
+        setFormData({ // Optionally clear the form
+          title: '',
+          description: '',
+          experienceLevel: '',
+          location: '',
+          salary: '',
+          deadlineDate: '',
+        });
+        if (onClose) onClose();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to post job');
+      }
+    } catch (err) {
+      console.error('Error posting job:', err);
+      setError('Failed to post job. Please try again.');
+      toast.error('Failed to post job. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };  
 
   return (
-    <Card sx={styles.card}>
-      <IconButton
-        sx={styles.closeButton}
-        onClick={onClose}
-        size="small"
-      >
-        <Close />
-      </IconButton>
+    <Card sx={{ ...defaultStyles.card, ...styles.card }}>
+      {onClose && (
+        <IconButton
+          sx={{ ...defaultStyles.closeButton, ...styles.closeButton }}
+          onClick={onClose}
+          size="small"
+        >
+          <Close />
+        </IconButton>
+      )}
+
       <CardContent>
         <Typography variant="h6" color="primary" gutterBottom>
-          Post Job 
+          Post Job
         </Typography>
-        <Box component="form" sx={styles.form} onSubmit={handleSubmit}>
+
+        <Box
+          component="form"
+          sx={{ ...defaultStyles.form, ...styles.form }}
+          onSubmit={handleSubmit}
+          noValidate
+        >
           <TextField
             label="Job Title"
             name="title"
             value={formData.title}
             onChange={handleChange}
             fullWidth
-            size="small"
             required
+            size="small"
+            error={!!error && !formData.title}
           />
 
           <TextField
@@ -66,13 +165,14 @@ const PostJobForm = ({ onClose, styles }) => {
             value={formData.description}
             onChange={handleChange}
             multiline
-            rows={3}
+            rows={4}
             fullWidth
-            size="small"
             required
+            size="small"
+            error={!!error && !formData.description}
           />
 
-          <FormControl fullWidth size="small">
+          <FormControl fullWidth size="small" required error={!!error && !formData.experienceLevel}>
             <InputLabel>Experience Level</InputLabel>
             <Select
               name="experienceLevel"
@@ -80,11 +180,10 @@ const PostJobForm = ({ onClose, styles }) => {
               onChange={handleChange}
               label="Experience Level"
             >
-              <MenuItem value="">Select Experience Level</MenuItem>
-              <MenuItem value="entry">Entry Level</MenuItem>
-              <MenuItem value="mid">Mid Level</MenuItem>
-              <MenuItem value="senior">Senior Level</MenuItem>
-              <MenuItem value="expert">Expert Level</MenuItem>
+              <MenuItem value="Entry Level">Entry Level</MenuItem>
+              <MenuItem value="Mid Level">Mid Level</MenuItem>
+              <MenuItem value="Senior Level">Senior Level</MenuItem>
+              <MenuItem value="Expert Level">Expert Level</MenuItem>
             </Select>
           </FormControl>
 
@@ -94,33 +193,61 @@ const PostJobForm = ({ onClose, styles }) => {
             value={formData.location}
             onChange={handleChange}
             fullWidth
-            size="small"
             required
+            size="small"
+            error={!!error && !formData.location}
           />
 
           <TextField
-            label="End Date"
-            name="endDate"
-            type="date"
-            value={formData.endDate}
+            label="Salary"
+            name="salary"
+            type="number"
+            value={formData.salary}
             onChange={handleChange}
-            InputLabelProps={{ shrink: true }}
             fullWidth
+            required
             size="small"
+            error={!!error && (!formData.salary || isNaN(Number(formData.salary)))}
+            InputProps={{
+              inputProps: { min: 0 },
+            }}
           />
 
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <TextField
+            label="Deadline Date"
+            name="deadlineDate"
+            type="date"
+            value={formData.deadlineDate}
+            onChange={handleChange}
+            fullWidth
+            required
+            size="small"
+            error={!!error && !formData.deadlineDate}
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+
+          {error && (
+            <Typography color="error" variant="body2">
+              {error}
+            </Typography>
+          )}
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
             <Button
               type="submit"
               variant="contained"
               color="primary"
-              size="small"
+              disabled={loading}
             >
-              Post Job
+              {loading ? 'Posting...' : 'Post Job'}
             </Button>
           </Box>
         </Box>
       </CardContent>
+
+      <ToastContainer position="top-right" />
     </Card>
   );
 };
