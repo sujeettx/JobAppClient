@@ -5,7 +5,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
-import Cookies from 'js-cookie';
+// import { AuthProvider } from '../context/AuthContext';
 
 const styles = {
   textField: {
@@ -21,8 +21,8 @@ const styles = {
     },
   },
   submitButton: {
-    mt: 2,
-    py: 1.5,
+    marginTop: 2,
+    padding: '0.75rem 0',
     borderRadius: 2,
     textTransform: 'none',
     fontSize: '1rem',
@@ -32,9 +32,14 @@ const styles = {
       background: 'linear-gradient(45deg, #1d4ed8, #2563eb)',
     },
   },
+  icon: {
+    marginRight: 1,
+    color: '#3b82f6'
+  }
 };
 
 const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
+  // const { login } = AuthProvider();
   const [formData, setFormData] = useState({
     Company_email: '',
     password: ''
@@ -42,73 +47,26 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Check if user is already logged in
-  React.useEffect(() => {
-    const token = Cookies.get('jwt_token');
-    if (token) {
-      // Redirect to dashboard or verify token validity
-      // window.location.href = '/dashboard';  // Uncomment this line to enable redirect
-    }
-  }, []);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setMessage('');
+    
     try {
       const response = await axios.post('http://localhost:5000/company/login', formData);
-      
       if (response.data.token) {
-        // Store the JWT token in cookies (expires in 7 days)
-        Cookies.set('jwt_token', response.data.token, { expires: 7 });
-        
-        // Set success message
         setMessage('Login successful!');
         setIsSuccess(true);
-
-        // Clear form
-        setFormData({
-          Company_email: '',
-          password: ''
-        });
-
-        // Redirect to dashboard (uncomment and modify as needed)
-        // window.location.href = '/dashboard';
+        // await login(response.data.token);
       }
     } catch (error) {
       setIsSuccess(false);
-      if (error.response) {
-        console.error("Error data:", error.response.data);
-        setMessage(error.response.data.message || 'Login failed. Please check your credentials.');
-      } else {
-        console.error("Error message:", error.message);
-        setMessage('Login failed. Please try again.');
-      }
+      setMessage(error.response?.data?.message || 'Login failed. Please try again.');
     }
-  };
-
-  // Function to check if token is valid
-  const verifyToken = async () => {
-    const token = Cookies.get('jwt_token');
-    if (token) {
-      try {
-        // Add this endpoint to your backend
-        const response = await axios.get('http://localhost:5000/company/verify-token', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        return response.data.valid;
-      } catch (error) {
-        Cookies.remove('jwt_token');
-        return false;
-      }
-    }
-    return false;
   };
 
   return (
@@ -124,7 +82,7 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
         value={formData.Company_email}
         onChange={handleChange}
         InputProps={{
-          startAdornment: <EmailIcon sx={{ mr: 1, color: '#3b82f6' }} />,
+          startAdornment: <EmailIcon sx={styles.icon} />,
         }}
       />
       <TextField
@@ -139,7 +97,7 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
         value={formData.password}
         onChange={handleChange}
         InputProps={{
-          startAdornment: <LockIcon sx={{ mr: 1, color: '#3b82f6' }} />,
+          startAdornment: <LockIcon sx={styles.icon} />,
           endAdornment: (
             <IconButton onClick={togglePasswordVisibility} edge="end" size="small">
               {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
@@ -155,9 +113,15 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
       >
         Login
       </Button>
-
       {message && (
-        <Typography variant="body2" sx={{ mt: 2, textAlign: 'center', color: isSuccess ? '#22c55e' : '#ff0000' }}>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            marginTop: 2, 
+            textAlign: 'center', 
+            color: isSuccess ? '#22c55e' : '#ff0000' 
+          }}
+        >
           {message}
         </Typography>
       )}

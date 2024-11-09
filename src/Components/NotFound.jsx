@@ -182,3 +182,86 @@ const NotFoundPage = () => {
 };
 
 export default NotFoundPage;
+
+export const commonStyles = {
+  textField: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 2,
+      backgroundColor: '#f8fafc',
+      '&:hover': {
+        backgroundColor: '#f1f5f9',
+      },
+      '&.Mui-focused': {
+        backgroundColor: '#fff',
+      },
+    },
+  },
+  submitButton: {
+    mt: 2,
+    py: 1.5,
+    borderRadius: 2,
+    textTransform: 'none',
+    fontSize: '1rem',
+    fontWeight: 600,
+    background: 'linear-gradient(45deg, #2563eb, #3b82f6)',
+    '&:hover': {
+      background: 'linear-gradient(45deg, #1d4ed8, #2563eb)',
+    },
+  },
+  inputIcon: {
+    mr: 1,
+    color: '#3b82f6'
+  },
+  message: {
+    mt: 2,
+    textAlign: 'center',
+  },
+  formContainer: {
+    width: '100%',
+    maxWidth: '450px',
+    p: { xs: 3, md: 4 },
+    borderRadius: 4,
+    bgcolor: '#fff',
+    border: '1px solid rgba(0, 0, 0, 0.06)',
+  },
+  formGridContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    bgcolor: '#fff',
+    p: { xs: 2, md: 6 },
+  },
+  marketingTitle: {
+    fontWeight: 700,
+    color: '#1e3a8a',
+    mb: 3,
+    fontSize: { xs: '2rem', md: '2.5rem' },
+  },
+  marketingSubtitle: {
+    color: '#64748b',
+    mb: 4,
+    maxWidth: '500px',
+    lineHeight: 1.6,
+  },
+  formTitle: {
+    fontWeight: 700,
+    mb: 0.5,
+    textAlign: 'center',
+    color: '#2563eb',
+  },
+  formSubtitle: {
+    color: 'text.secondary',
+    textAlign: 'center',
+    mb: 3,
+  },
+  toggleButton: {
+    mt: 2,
+    color: '#2563eb',
+    textTransform: 'none',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    '&:hover': {
+      backgroundColor: 'rgba(37, 99, 235, 0.04)',
+    },
+  },
+};

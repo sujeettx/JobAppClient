@@ -74,7 +74,7 @@ const Header = () => {
 
   const navigationLinks = [
     { text: 'Find Jobs', href: '/find-jobs' },
-    { text: 'Post a Job', href: '/post-job' },
+    { text: 'Post Job', href: '/post-job' }, // New route added
   ];
 
   const mobileDrawer = (
@@ -179,7 +179,7 @@ const Header = () => {
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // Better mobile performance
+          keepMounted: true,
         }}
       >
         {mobileDrawer}
