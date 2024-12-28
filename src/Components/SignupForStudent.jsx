@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, IconButton, Chip, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { changeFormType } from './AuthPage';
 import {
   Email as EmailIcon,
   Person as PersonIcon,
@@ -149,7 +150,7 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setTimeout(changeFormType('login'),1000);
     if (!validateForm()) {
       return;
     }

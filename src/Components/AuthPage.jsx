@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Box, Typography, Grid } from '@mui/material';
 import LoginForm from './Login';
-import SignUpForm from './SignupForStudent';
-
+import SignUpFormStudent from './SignupForStudent';
+import SignUpFormCompany from './SignforComapany';
+export let changeFormType;
 const styles = {
   formContainer: {
     width: '100%',
@@ -39,15 +40,74 @@ const styles = {
     '&:hover': {
       backgroundColor: 'rgba(37, 99, 235, 0.04)',
     },
+  },
+  companyButton: {
+    marginTop: 1,
+    color: '#2563eb',
+    textTransform: 'none',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    '&:hover': {
+      backgroundColor: 'rgba(37, 99, 235, 0.04)',
+    },
   }
 };
 
 const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(false);
+  const [formType, setFormType] = useState('student'); // 'student', 'company', or 'login'
   const [showPassword, setShowPassword] = useState(false);
-
-  const toggleForm = () => setIsLogin(!isLogin);
+  changeFormType = (newFormType) => {
+    setFormType(newFormType);
+};
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
+  const renderTitle = () => {
+    switch(formType) {
+      case 'login':
+        return 'Welcome Back';
+      case 'company':
+        return 'Create Company Account';
+      default:
+        return 'Get Started';
+    }
+  };
+
+  const renderSubtitle = () => {
+    switch(formType) {
+      case 'login':
+        return 'Login to access your account';
+      case 'company':
+        return 'Create your company account and start hiring';
+      default:
+        return 'Create your account and start applying';
+    }
+  };
+
+  const renderForm = () => {
+    switch(formType) {
+      case 'login':
+        return (
+          <LoginForm
+            showPassword={showPassword}
+            togglePasswordVisibility={togglePasswordVisibility}
+          />
+        );
+      case 'company':
+        return (
+          <SignUpFormCompany
+            showPassword={showPassword}
+            togglePasswordVisibility={togglePasswordVisibility}
+          />
+        );
+      default:
+        return (
+          <SignUpFormStudent
+            showPassword={showPassword}
+            togglePasswordVisibility={togglePasswordVisibility}
+          />
+        );
+    }
+  };
 
   return (
     <Box sx={{ minHeight: '30vh', display: 'flex' }}>
@@ -66,14 +126,13 @@ const AuthPage = () => {
           }}
         >
           <Typography variant="h2" sx={styles.marketingTitle}>
-            Find Your Next<br />Great Hire
+            Find Your Next<br />Great Opportunity
           </Typography>
           <Typography variant="h6" sx={styles.marketingSubtitle}>
-            Connect with top talent and build your dream team. Post jobs, review applications, 
-            and hire the best candidates all in one place.
+            Connect with top companies and build your career. Apply to jobs,
+            track applications, and find your dream role all in one place.
           </Typography>
         </Grid>
-
         <Grid
           item
           xs={12}
@@ -88,34 +147,48 @@ const AuthPage = () => {
         >
           <Box sx={styles.formContainer}>
             <Typography variant="h4" sx={styles.formTitle}>
-              {isLogin ? 'Welcome Back' : 'Get Started'}
+              {renderTitle()}
             </Typography>
             <Typography
               variant="body2"
               sx={{ color: 'text.secondary', textAlign: 'center', mb: 3 }}
             >
-              {isLogin ? 'Login to access your account' : 'Create your account and start hiring'}
+              {renderSubtitle()}
             </Typography>
+            
+            {renderForm()}
 
-            {isLogin ? (
-              <LoginForm
-                showPassword={showPassword}
-                togglePasswordVisibility={togglePasswordVisibility}
-              />
-            ) : (
-              <SignUpForm
-                showPassword={showPassword}
-                togglePasswordVisibility={togglePasswordVisibility}
-              />
-            )}
+            <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {formType !== 'login' && (
+                <Button
+                  fullWidth
+                  onClick={() => setFormType('login')}
+                  sx={styles.toggleButton}
+                >
+                  Already have an account? Login
+                </Button>
+              )}
+              
+              {formType === 'login' && (
+                <Button
+                  fullWidth
+                  onClick={() => setFormType('student')}
+                  sx={styles.toggleButton}
+                >
+                  Don't have an account? Sign Up
+                </Button>
+              )}
 
-            <Button
-              fullWidth
-              onClick={toggleForm}
-              sx={styles.toggleButton}
-            >
-              {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Login'}
-            </Button>
+              {formType !== 'company' && (
+                <Button
+                  fullWidth
+                  onClick={() => setFormType('company')}
+                  sx={styles.companyButton}
+                >
+                  Sign Up as a Company
+                </Button>
+              )}
+            </Box>
           </Box>
         </Grid>
       </Grid>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -17,6 +17,11 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
+import LogoutIcon from '@mui/icons-material/Logout';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import WorkIcon from '@mui/icons-material/Work';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import BusinessIcon from '@mui/icons-material/Business';
 
 const styles = {
   appBar: {
@@ -31,25 +36,71 @@ const styles = {
       margin: 0,
     },
   },
-  navLink: {
-    color: '#4b5563',
+  navButton: {
+    textTransform: 'none',
     fontWeight: 500,
-    fontSize: '0.975rem',
-    transition: 'color 0.2s ease',
+    color: '#4b5563',
+    padding: '6px 16px',
     '&:hover': {
+      backgroundColor: '#f8fafc',
       color: '#2563eb',
     },
   },
-  loginButton: {
-    textTransform: 'none',
-    fontWeight: 500,
+  activeNavButton: {
+    backgroundColor: '#eff6ff',
+    color: '#2563eb',
+    '&:hover': {
+      backgroundColor: '#dbeafe',
+      color: '#2563eb',
+    },
   },
   signUpButton: {
     textTransform: 'none',
-    fontWeight: 500,
+    fontWeight: 600,
+    padding: '8px 20px',
+    backgroundColor: '#2563eb',
     boxShadow: 'none',
     '&:hover': {
+      backgroundColor: '#1d4ed8',
       boxShadow: 'none',
+    },
+  },
+  logoutButton: {
+    textTransform: 'none',
+    fontWeight: 500,
+    padding: '6px 16px',
+    color: '#white',
+    backgroundColor: 'blue',
+    '&:hover': {
+      backgroundColor: 'darkblue',
+    },
+  },
+  mobileLogoutButton: {
+    textTransform: 'none',
+    fontWeight: 500,
+    color: '#ef4444',
+    width: '100%',
+    justifyContent: 'flex-start',
+    padding: '12px 16px',
+    '&:hover': {
+      backgroundColor: '#fee2e2',
+    },
+  },
+  drawerList: {
+    width: 250,
+    '& .MuiListItem-root': {
+      padding: '4px 16px',
+    },
+  },
+  mobileNavItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '12px 16px',
+    color: '#4b5563',
+    '&:hover': {
+      backgroundColor: '#f8fafc',
+      color: '#2563eb',
     },
   },
 };
@@ -59,6 +110,11 @@ const Header = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  useEffect(() => {
+    const role = sessionStorage.getItem('userRole');
+    setUserRole(role);
+  }, []);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -68,44 +124,115 @@ const Header = () => {
     navigate('/signup');
   };
 
-  // const handleLogin = () => {
-  //   navigate('/login');
-  // };
+  const handleLogout = () => {
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('userRole');
+    sessionStorage.removeItem('userId')
+    setUserRole(null);
+    navigate('/');
+  };
 
-  const navigationLinks = [
-    { text: 'Find Jobs', href: '/find-jobs' },
-    { text: 'Post Job', href: '/post-job' }, // New route added
-  ];
+  const getNavigationLinks = () => {
+    if (!userRole) return [];
+    
+    if (userRole === 'student') {
+      return [
+        { text: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> },
+        { text: 'Find Jobs', href: '/find-jobs', icon: <WorkIcon /> },
+        { text: 'Job Status', href: '/job-status', icon: <AssignmentIcon /> },
+      ];
+    }
+    
+    if (userRole === 'company') {
+      return [
+        { text: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> },
+        { text: 'Post Job', href: '/post-job', icon: <BusinessIcon /> },
+        { text: 'Applicants', href: '/applicants', icon: <AssignmentIcon /> },
+      ];
+    }
+    
+    return [];
+  };
+
+  const navigationLinks = getNavigationLinks();
+
+  const renderNavButtons = () => (
+    <Stack direction="row" spacing={2} alignItems="center">
+      {navigationLinks.map((item) => (
+        <Button
+          key={item.text}
+          startIcon={item.icon}
+          onClick={() => navigate(item.href)}
+          sx={styles.navButton}
+        >
+          {item.text}
+        </Button>
+      ))}
+      {userRole && (
+        <Button
+          variant="contained"
+          startIcon={<LogoutIcon />}
+          onClick={handleLogout}
+          sx={styles.logoutButton}
+        >
+          Logout
+        </Button>
+      )}
+      {!userRole && (
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={handleSignUp}
+          sx={styles.signUpButton}
+        >
+          Sign Up
+        </Button>
+      )}
+    </Stack>
+  );
 
   const mobileDrawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-      <List>
+    <Box sx={{ textAlign: 'center' }}>
+      <List sx={styles.drawerList}>
         {navigationLinks.map((item) => (
-          <ListItem key={item.text} button component={Link} href={item.href}>
+          <ListItem 
+            key={item.text} 
+            button 
+            onClick={() => {
+              navigate(item.href);
+              handleDrawerToggle();
+            }}
+            sx={styles.mobileNavItem}
+          >
+            {item.icon}
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
-        {/* <ListItem>
-          <Button 
-            color="primary" 
-            fullWidth 
-            onClick={handleLogin}
-            sx={styles.loginButton}
-          >
-            Log in
-          </Button>
-        </ListItem> */}
-        <ListItem>
-          <Button
-            color="primary"
-            variant="contained"
-            fullWidth
-            onClick={handleSignUp}
-            sx={styles.signUpButton}
-          >
-            Sign Up
-          </Button>
-        </ListItem>
+        {userRole && (
+          <ListItem>
+            <Button
+              fullWidth
+              startIcon={<LogoutIcon />}
+              onClick={handleLogout}
+              sx={styles.mobileLogoutButton}
+            >
+              Logout
+            </Button>
+          </ListItem>
+        )}
+        {!userRole && (
+          <ListItem>
+            <Button
+              color="primary"
+              variant="contained"
+              fullWidth
+              onClick={handleSignUp}
+              sx={styles.signUpButton}
+            >
+              Sign Up
+            </Button>
+          </ListItem>
+        )}
       </List>
     </Box>
   );
@@ -114,32 +241,19 @@ const Header = () => {
     <AppBar position="sticky" elevation={0} sx={styles.appBar}>
       <Container>
         <Toolbar sx={{ justifyContent: 'space-between', padding: '0.5rem 0' }}>
-          {/* Left side - Logo */}
           <Box sx={styles.logo} display="flex" alignItems="center">
             <Link href="/" underline="none">
               <h1>Job Posting</h1>
             </Link>
           </Box>
-
-          {!isMobile && (
-            <Stack direction="row" spacing={2}>
-              <Button
-                color="primary"
-                variant="contained"
-                onClick={handleSignUp}
-                sx={styles.signUpButton}
-              >
-                Sign Up
-              </Button>
-            </Stack>
-          )}
-
-          {/* Mobile Menu Icon */}
+          
+          {!isMobile && renderNavButtons()}
+          
           {isMobile && (
             <IconButton
               color="primary"
               aria-label="open drawer"
-              edge="start"
+              edge="end"
               onClick={handleDrawerToggle}
             >
               <MenuIcon />
@@ -147,8 +261,7 @@ const Header = () => {
           )}
         </Toolbar>
       </Container>
-
-      {/* Mobile Drawer */}
+      
       <Drawer
         anchor="right"
         variant="temporary"

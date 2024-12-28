@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, IconButton } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { changeFormType } from './AuthPage';
 import {
   Email as EmailIcon,
   Business as BusinessIcon,
@@ -45,7 +45,6 @@ const styles = {
 };
 
 const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
-  const navigate = useNavigate();
 
   const initialFormState = {
     email: '',
@@ -115,7 +114,7 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setTimeout(changeFormType('login'),1000);
     if (!validateForm()) {
       return;
     }
@@ -128,7 +127,6 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
       setMessage('Registration successful! Redirecting to login...');
       setIsSuccess(true);
       setFormData(initialFormState);
-      setTimeout(() => navigate('/login'), 1500);
     } catch (error) {
       setIsSuccess(false);
       setMessage(error.response?.data?.message || 'Registration failed. Please try again.');

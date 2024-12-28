@@ -58,9 +58,18 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
 
     try {
       const response = await axios.post('http://localhost:5000/user/login', formData);
+      
       if (response.data.token) {
+        // Store token and role in sessionStorage for better security
+        sessionStorage.setItem('authToken', response.data.token);
+        sessionStorage.setItem('userRole', response.data.role);
+        sessionStorage.setItem('userId', response.data.userId);
+        
         setMessage('Login successful!');
         setIsSuccess(true);
+        
+        // Optional: Redirect or update UI state here
+        window.location.href = '/dashboard'; // or use navigation from your router
       }
     } catch (error) {
       setIsSuccess(false);
@@ -71,11 +80,11 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
   };
 
   return (
-    <Box 
-      component="form" 
-      noValidate 
-      autoComplete="off" 
-      onSubmit={handleSubmit} 
+    <Box
+      component="form"
+      noValidate
+      autoComplete="off"
+      onSubmit={handleSubmit}
       sx={{ marginTop: "5vh" }}
     >
       <TextField
@@ -93,7 +102,7 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
         }}
         disabled={isSubmitting}
       />
-      
+     
       <TextField
         fullWidth
         size="small"
@@ -108,9 +117,9 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
         InputProps={{
           startAdornment: <LockIcon sx={styles.icon} />,
           endAdornment: (
-            <IconButton 
-              onClick={togglePasswordVisibility} 
-              edge="end" 
+            <IconButton
+              onClick={togglePasswordVisibility}
+              edge="end"
               size="small"
               disabled={isSubmitting}
             >
@@ -120,7 +129,7 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
         }}
         disabled={isSubmitting}
       />
-      
+     
       <Button
         fullWidth
         type="submit"
@@ -130,9 +139,8 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
       >
         {isSubmitting ? 'Logging in...' : 'Login'}
       </Button>
-
       {message && (
-        <Typography 
+        <Typography
           variant="body2"
           sx={{
             marginTop: 2,
