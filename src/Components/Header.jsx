@@ -68,9 +68,9 @@ const Header = () => {
     navigate('/signup');
   };
 
-  const handleLogin = () => {
-    navigate('/login');
-  };
+  // const handleLogin = () => {
+  //   navigate('/login');
+  // };
 
   const navigationLinks = [
     { text: 'Find Jobs', href: '/find-jobs' },
@@ -85,7 +85,7 @@ const Header = () => {
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
-        <ListItem>
+        {/* <ListItem>
           <Button 
             color="primary" 
             fullWidth 
@@ -94,7 +94,7 @@ const Header = () => {
           >
             Log in
           </Button>
-        </ListItem>
+        </ListItem> */}
         <ListItem>
           <Button
             color="primary"
@@ -121,32 +121,8 @@ const Header = () => {
             </Link>
           </Box>
 
-          {/* Center - Navigation Links (Desktop) */}
-          {!isMobile && (
-            <Stack direction="row" spacing={4}>
-              {navigationLinks.map((link) => (
-                <Link
-                  key={link.text}
-                  href={link.href}
-                  underline="none"
-                  sx={styles.navLink}
-                >
-                  {link.text}
-                </Link>
-              ))}
-            </Stack>
-          )}
-
-          {/* Right side - Auth Buttons (Desktop) */}
           {!isMobile && (
             <Stack direction="row" spacing={2}>
-              <Button
-                color="primary"
-                onClick={handleLogin}
-                sx={styles.loginButton}
-              >
-                Log in
-              </Button>
               <Button
                 color="primary"
                 variant="contained"

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Box, Typography, Grid } from '@mui/material';
 import LoginForm from './Login';
-import SignUpForm from './SignUpPage';
+import SignUpForm from './SignupForStudent';
 
 const styles = {
   formContainer: {

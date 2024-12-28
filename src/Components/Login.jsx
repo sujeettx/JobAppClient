@@ -5,7 +5,6 @@ import LockIcon from '@mui/icons-material/Lock';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
-// import { AuthProvider } from '../context/AuthContext';
 
 const styles = {
   textField: {
@@ -39,13 +38,13 @@ const styles = {
 };
 
 const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
-  // const { login } = AuthProvider();
   const [formData, setFormData] = useState({
-    Company_email: '',
+    email: '',
     password: ''
   });
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,22 +54,30 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
-    
+    setIsSubmitting(true);
+
     try {
-      const response = await axios.post('http://localhost:5000/company/login', formData);
+      const response = await axios.post('http://localhost:5000/user/login', formData);
       if (response.data.token) {
         setMessage('Login successful!');
         setIsSuccess(true);
-        // await login(response.data.token);
       }
     } catch (error) {
       setIsSuccess(false);
       setMessage(error.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
+    <Box 
+      component="form" 
+      noValidate 
+      autoComplete="off" 
+      onSubmit={handleSubmit} 
+      sx={{ marginTop: "5vh" }}
+    >
       <TextField
         fullWidth
         size="small"
@@ -78,13 +85,15 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
         variant="outlined"
         margin="dense"
         sx={styles.textField}
-        name="Company_email"
-        value={formData.Company_email}
+        name="email"
+        value={formData.email}
         onChange={handleChange}
         InputProps={{
           startAdornment: <EmailIcon sx={styles.icon} />,
         }}
+        disabled={isSubmitting}
       />
+      
       <TextField
         fullWidth
         size="small"
@@ -99,27 +108,36 @@ const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
         InputProps={{
           startAdornment: <LockIcon sx={styles.icon} />,
           endAdornment: (
-            <IconButton onClick={togglePasswordVisibility} edge="end" size="small">
+            <IconButton 
+              onClick={togglePasswordVisibility} 
+              edge="end" 
+              size="small"
+              disabled={isSubmitting}
+            >
               {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
             </IconButton>
           ),
         }}
+        disabled={isSubmitting}
       />
+      
       <Button
         fullWidth
         type="submit"
         variant="contained"
         sx={styles.submitButton}
+        disabled={isSubmitting}
       >
-        Login
+        {isSubmitting ? 'Logging in...' : 'Login'}
       </Button>
+
       {message && (
         <Typography 
-          variant="body2" 
-          sx={{ 
-            marginTop: 2, 
-            textAlign: 'center', 
-            color: isSuccess ? '#22c55e' : '#ff0000' 
+          variant="body2"
+          sx={{
+            marginTop: 2,
+            textAlign: 'center',
+            color: isSuccess ? '#22c55e' : '#ff0000'
           }}
         >
           {message}

@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, IconButton } from '@mui/material';
+import { TextField, Button, Box, Typography, IconButton, Chip, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import {
-  Person as PersonIcon,
-  Phone as PhoneIcon,
-  Business as BusinessIcon,
   Email as EmailIcon,
-  Group as GroupIcon,
+  Person as PersonIcon,
+  Description as ResumeIcon,
+  Code as SkillsIcon,
+  Web as PortfolioIcon,
   Lock as LockIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon
+  VisibilityOff as VisibilityOffIcon,
+  Add as AddIcon
 } from '@mui/icons-material';
 import axios from 'axios';
-// import { AuthProvider } from '../context/AuthContext';
 
 const styles = {
   textField: {
@@ -42,23 +42,32 @@ const styles = {
   icon: {
     marginRight: 1,
     color: '#3b82f6'
+  },
+  chipContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 1,
+    marginTop: 1
   }
 };
 
 const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
   const navigate = useNavigate();
-  // const { login } = AuthProvider();
-  
+
   const initialFormState = {
-    name: '',
-    company_name: '',
-    Company_email: '',
-    phoneNumber: '',
-    employee_size: '',
-    password: ''
+    email: '',
+    password: '',
+    role: 'student',
+    profile: {
+      fullName: '',
+      resumeLink: '',
+      skills: [],
+      portfolio: ''
+    }
   };
 
   const [formData, setFormData] = useState(initialFormState);
+  const [newSkill, setNewSkill] = useState('');
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
@@ -67,36 +76,30 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-    
-    if (!formData.company_name.trim()) {
-      newErrors.company_name = 'Company name is required';
-    }
-    
-    if (!formData.Company_email.trim()) {
-      newErrors.Company_email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.Company_email)) {
-      newErrors.Company_email = 'Please enter a valid email';
-    }
-    
-    if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required';
-    } else if (!/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ''))) {
-      newErrors.phoneNumber = 'Please enter a valid 10-digit phone number';
-    }
-    
-    if (!formData.employee_size.trim()) {
-      newErrors.employee_size = 'Employee size is required';
-    } else if (isNaN(formData.employee_size) || parseInt(formData.employee_size) < 1) {
-      newErrors.employee_size = 'Please enter a valid number';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email';
     }
     
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    if (!formData.profile.fullName.trim()) {
+      newErrors.fullName = 'Full name is required';
+    }
+
+    if (!formData.profile.resumeLink.trim()) {
+      newErrors.resumeLink = 'Resume link is required';
+    }
+
+    if (!formData.profile.portfolio.trim()) {
+      newErrors.portfolio = 'Portfolio link is required';
+    }
+
+    if (formData.profile.skills.length === 0) {
+      newErrors.skills = 'At least one skill is required';
     }
     
     setErrors(newErrors);
@@ -105,11 +108,43 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
+    if (name in initialFormState) {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        profile: { ...prev.profile, [name]: value }
+      }));
+    }
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+  };
+
+  const handleAddSkill = () => {
+    if (newSkill.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        profile: {
+          ...prev.profile,
+          skills: [...prev.profile.skills, newSkill.trim()]
+        }
+      }));
+      setNewSkill('');
+      if (errors.skills) {
+        setErrors(prev => ({ ...prev, skills: '' }));
+      }
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      profile: {
+        ...prev.profile,
+        skills: prev.profile.skills.filter(skill => skill !== skillToRemove)
+      }
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -123,41 +158,24 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
     setMessage('');
 
     try {
-      const response = await axios.post('http://localhost:5000/company/register', {
-        ...formData,
-        employee_size: parseInt(formData.employee_size),
-      });
-
+      await axios.post('http://localhost:5000/user/register', formData);
       setMessage('Registration successful! Redirecting to login...');
       setIsSuccess(true);
       setFormData(initialFormState);
-      
-      // Optional: Auto-login after successful registration
-      if (response.data.token) {
-        // await login(response.data.token);
-      } else {
-        setTimeout(() => navigate('/login'), 1500);
-      }
+      setTimeout(() => navigate('/login'), 1500);
     } catch (error) {
       setIsSuccess(false);
-      if (error.response?.data?.message) {
-        setMessage(error.response.data.message);
-      } else if (error.response?.status === 409) {
-        setMessage('This email is already registered. Please try logging in.');
-      } else {
-        setMessage('Registration failed. Please try again.');
-      }
+      setMessage(error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const formFields = [
-    { name: 'name', label: 'Name', Icon: PersonIcon },
-    { name: 'phoneNumber', label: 'Phone no.', Icon: PhoneIcon },
-    { name: 'company_name', label: 'Company Name', Icon: BusinessIcon },
-    { name: 'Company_email', label: 'Company Email', Icon: EmailIcon },
-    { name: 'employee_size', label: 'Employee Size', Icon: GroupIcon },
+    { name: 'email', label: 'Email', Icon: EmailIcon },
+    { name: 'fullName', label: 'Full Name', Icon: PersonIcon },
+    { name: 'resumeLink', label: 'Resume Link', Icon: ResumeIcon },
+    { name: 'portfolio', label: 'Portfolio Link', Icon: PortfolioIcon },
   ];
 
   return (
@@ -172,7 +190,7 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
           margin="dense"
           sx={styles.textField}
           name={name}
-          value={formData[name]}
+          value={name === 'email' ? formData.email : formData.profile[name]}
           onChange={handleChange}
           error={Boolean(errors[name])}
           helperText={errors[name]}
@@ -182,6 +200,48 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
           disabled={isSubmitting}
         />
       ))}
+
+      <Box sx={{ mt: 2 }}>
+        <TextField
+          fullWidth
+          size="small"
+          label="Add Skills"
+          variant="outlined"
+          value={newSkill}
+          onChange={(e) => setNewSkill(e.target.value)}
+          error={Boolean(errors.skills)}
+          helperText={errors.skills}
+          InputProps={{
+            startAdornment: <SkillsIcon sx={styles.icon} />,
+            endAdornment: (
+              <IconButton 
+                onClick={handleAddSkill}
+                edge="end"
+                disabled={!newSkill.trim()}
+              >
+                <AddIcon />
+              </IconButton>
+            ),
+          }}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleAddSkill();
+            }
+          }}
+        />
+        <Stack direction="row" sx={styles.chipContainer}>
+          {formData.profile.skills.map((skill, index) => (
+            <Chip
+              key={index}
+              label={skill}
+              onDelete={() => handleRemoveSkill(skill)}
+              color="primary"
+              variant="outlined"
+            />
+          ))}
+        </Stack>
+      </Box>
       
       <TextField
         fullWidth
