@@ -70,10 +70,7 @@ const styles = {
     fontWeight: 500,
     padding: '6px 16px',
     color: '#white',
-    backgroundColor: 'blue',
-    '&:hover': {
-      backgroundColor: 'darkblue',
-    },
+    backgroundColor: '#1976d2',
   },
   mobileLogoutButton: {
     textTransform: 'none',

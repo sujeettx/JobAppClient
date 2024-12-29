@@ -123,7 +123,7 @@ const SignUpForm = ({ showPassword, togglePasswordVisibility }) => {
     setMessage('');
 
     try {
-      await axios.post('http://localhost:5000/user/register', formData);
+      await axios.post('http://localhost:8080/users/register', formData);
       setMessage('Registration successful! Redirecting to login...');
       setIsSuccess(true);
       setFormData(initialFormState);
