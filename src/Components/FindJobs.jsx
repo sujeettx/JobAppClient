@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Search } from '@mui/icons-material';
+import axios from 'axios';
+import { JobCard } from './jobs/JobCard';
+import { JobDetails } from './jobs/JobDetails';
 import {
   Container,
   Grid,
@@ -8,11 +12,8 @@ import {
   InputAdornment,
   CircularProgress,
   Alert,
-  styled
+  styled,
 } from '@mui/material';
-import { Search } from '@mui/icons-material';
-import axios from 'axios';
-import {JobCard} from './jobs/JobCard';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -25,21 +26,42 @@ const SearchBox = styled(Box)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
 }));
 
+const GradientTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  background: 'linear-gradient(45deg, #2563eb, #3b82f6)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  marginBottom: theme.spacing(4),
+}));
+
 const FindJobs = () => {
+  const API_URL = 'http://localhost:8080/jobs';
+
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedJobId, setSelectedJobId] = useState(null);
+
+  const getAuthHeader = () => ({
+    headers: {
+      Authorization: sessionStorage.getItem('authToken'),
+    },
+  });
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/jobs/all');
+        const response = await axios.get(API_URL, getAuthHeader());
         setJobs(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching jobs:', error);
-        setError('Failed to load jobs. Please try again later.');
+        setError('');
+      } catch (err) {
+        console.error('Error fetching jobs:', err);
+        setError(
+          err.response?.data?.message || 
+          'Failed to load jobs. Please try again later.'
+        );
+      } finally {
         setLoading(false);
       }
     };
@@ -47,80 +69,78 @@ const FindJobs = () => {
     fetchJobs();
   }, []);
 
-  const filteredJobs = jobs.filter(job =>
-    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.location.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredJobs = jobs.filter((job) =>
+    job.experienceLevel.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) {
-    return (
-      <StyledContainer maxWidth="lg">
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
-        </Box>
-      </StyledContainer>
-    );
-  }
+  const handleJobSelect = (jobId) => {
+    setSelectedJobId(jobId);
+  };
 
-  if (error) {
-    return (
-      <StyledContainer maxWidth="lg">
-        <Alert severity="error" sx={{ mb: 4 }}>
-          {error}
-        </Alert>
-      </StyledContainer>
-    );
-  }
+  const handleBack = () => {
+    setSelectedJobId(null);
+  };
 
   return (
     <StyledContainer maxWidth="lg">
-      <Typography 
-        variant="h4" 
-        component="h1" 
-        gutterBottom 
-        sx={{ 
-          fontWeight: 700,
-          background: 'linear-gradient(45deg, #2563eb, #3b82f6)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          mb: 4 
-        }}
-      >
-        Find Your Dream Job
-      </Typography>
-
-      <SearchBox>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search for jobs, companies, or locations..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
+      {selectedJobId ? (
+        <JobDetails 
+          jobId={selectedJobId} 
+          onBack={handleBack}
+          authHeader={getAuthHeader()}
         />
-      </SearchBox>
+      ) : (
+        <>
+          <GradientTitle variant="h4" component="h1">
+            Find Jobs by Experience Level
+          </GradientTitle>
 
-      <Grid container spacing={3}>
-        {filteredJobs.map((job) => (
-          <Grid item xs={12} sm={6} lg={4} key={job._id}>
-            <JobCard job={job} />
-          </Grid>
-        ))}
-      </Grid>
+          <SearchBox>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search by experience level (e.g., Entry, Mid, Senior)..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </SearchBox>
 
-      {filteredJobs.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography variant="h6" color="text.secondary">
-            No jobs found matching your search criteria.
-          </Typography>
-        </Box>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Alert severity="error" sx={{ mb: 4 }}>
+              {error}
+            </Alert>
+          ) : (
+            <Grid container spacing={3}>
+              {filteredJobs.map((job) => (
+                <Grid item xs={12} sm={6} lg={4} key={job._id}>
+                  <JobCard 
+                    job={job} 
+                    onClick={() => handleJobSelect(job._id)} 
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          )}
+
+          {!loading && filteredJobs.length === 0 && (
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <Typography variant="h6" color="text.secondary">
+                No jobs found matching the specified experience level.
+              </Typography>
+            </Box>
+          )}
+        </>
       )}
     </StyledContainer>
   );
