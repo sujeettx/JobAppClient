@@ -138,7 +138,7 @@ const Header = () => {
     if (userRole === 'student') {
       return [
         { text: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> },
-        { text: 'Find Jobs', href: '/find-jobs', icon: <WorkIcon /> },
+        { text: 'Find Jobs', href: '/view-jobs', icon: <WorkIcon /> },
         { text: 'Job Status', href: '/job-status', icon: <AssignmentIcon /> },
       ];
     }

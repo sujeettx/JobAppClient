@@ -43,13 +43,13 @@ const PostJobForm = ({ onClose, styles = {} }) => {
     experienceLevel: '',
     location: '',
     salary: '',
-    deadlineDate: '', // Match backend field name "deadlineDate"
+    deadlineDate: '',
+    requirements: '', // New field for requirements as comma-separated string
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -58,7 +58,6 @@ const PostJobForm = ({ onClose, styles = {} }) => {
     }));
   };
 
-  // Validate form fields
   const validateForm = () => {
     if (!formData.title.trim()) return 'Job title is required';
     if (!formData.description.trim()) return 'Job description is required';
@@ -69,7 +68,6 @@ const PostJobForm = ({ onClose, styles = {} }) => {
     return null;
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationError = validateForm();
@@ -87,11 +85,11 @@ const PostJobForm = ({ onClose, styles = {} }) => {
         description: formData.description.trim(),
         experienceLevel: formData.experienceLevel,
         location: formData.location.trim(),
-        salary: Number(formData.salary),
+        salary: formData.salary.trim(), // Keep as string to preserve salary format
         DeadlineDate: new Date(formData.deadlineDate).toISOString(),
       };
   
-      const response = await fetch('http://localhost:5000/jobs/post', {
+      const response = await fetch('http://localhost:5000/job', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,15 +99,15 @@ const PostJobForm = ({ onClose, styles = {} }) => {
       });
   
       if (response.ok) {
-        // const data = await response.json();
-        toast.success('Job posted successfully!'); // Success message
-        setFormData({ // Optionally clear the form
+        toast.success('Job posted successfully!');
+        setFormData({
           title: '',
           description: '',
           experienceLevel: '',
           location: '',
           salary: '',
           deadlineDate: '',
+          requirements: '',
         });
         if (onClose) onClose();
       } else {
@@ -199,20 +197,15 @@ const PostJobForm = ({ onClose, styles = {} }) => {
           />
 
           <TextField
-            label="Salary"
+            label="Salary (e.g., 100000/year)"
             name="salary"
-            type="number"
             value={formData.salary}
             onChange={handleChange}
             fullWidth
             required
             size="small"
-            error={!!error && (!formData.salary || isNaN(Number(formData.salary)))}
-            InputProps={{
-              inputProps: { min: 0 },
-            }}
+            error={!!error && !formData.salary}
           />
-
           <TextField
             label="Deadline Date"
             name="deadlineDate"
