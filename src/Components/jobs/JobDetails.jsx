@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import {
   Container,
   Typography,
@@ -11,54 +12,114 @@ import {
   Alert,
   Chip,
   Snackbar,
+  Link,
 } from '@mui/material';
 import { 
   LocationOn, 
   WorkHistory, 
   ArrowBack,
   AccessTime,
-  AttachMoney 
+  AttachMoney,
+  Business,
+  Work,
+  Language,
+  Groups,
+  Circle
 } from '@mui/icons-material';
-import axios from 'axios';
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  marginTop: theme.spacing(4),
+// Enhanced styled components with modern design
+const MainPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(4),
+  marginTop: theme.spacing(3),
+  borderRadius: '16px',
+  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
   position: 'relative',
+  overflow: 'hidden',
   '&::before': {
     content: '""',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: '4px',
-    background: 'linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)',
-    borderRadius: '4px 4px 0 0',
-  },
+    height: '6px',
+    background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)',
+  }
+}));
+
+const HeaderSection = styled(Box)({
+  marginBottom: '2rem',
+});
+
+const CompanyTitle = styled(Typography)(({ theme }) => ({
+  color: theme.palette.primary.main,
+  fontWeight: 600,
+  marginTop: '0.5rem',
+  marginBottom: '1.5rem',
+}));
+
+const InfoGrid = styled(Box)(({ theme }) => ({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+  gap: theme.spacing(3),
+  marginBottom: theme.spacing(4),
 }));
 
 const InfoItem = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(1),
-  marginBottom: theme.spacing(2),
-}));
-
-const SalaryChip = styled(Chip)(({ theme }) => ({
-  backgroundColor: theme.palette.success.light,
-  color: theme.palette.success.contrastText,
-  fontWeight: 600,
-  '& .MuiChip-icon': {
-    color: 'inherit',
+  gap: theme.spacing(1.5),
+  padding: theme.spacing(1.5),
+  backgroundColor: theme.palette.background.default,
+  borderRadius: '8px',
+  '& .MuiSvgIcon-root': {
+    color: theme.palette.primary.main,
   },
 }));
 
-const DeadlineChip = styled(Chip)(({ theme }) => ({
-  backgroundColor: theme.palette.warning.light,
-  color: theme.palette.warning.contrastText,
+const StyledChip = styled(Chip)(({ theme, variant }) => ({
+  borderRadius: '8px',
+  padding: '4px 8px',
+  height: '36px',
+  fontWeight: 500,
+  ...(variant === 'salary' && {
+    backgroundColor: '#ecfdf5',
+    color: '#059669',
+    '& .MuiChip-icon': { color: '#059669' },
+  }),
+  ...(variant === 'deadline' && {
+    backgroundColor: '#fff7ed',
+    color: '#c2410c',
+    '& .MuiChip-icon': { color: '#c2410c' },
+  }),
+  ...(variant === 'highlight' && {
+    backgroundColor: '#f3e8ff',
+    color: '#7e22ce',
+    margin: '4px',
+  }),
+  ...(variant === 'skill' && {
+    backgroundColor: '#e0f2fe',
+    color: '#0369a1',
+    margin: '4px',
+  }),
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 600,
-  '& .MuiChip-icon': {
-    color: 'inherit',
+  marginBottom: theme.spacing(2),
+  marginTop: theme.spacing(4),
+}));
+
+const RequirementList = styled(Box)(({ theme }) => ({
+  '& > div': {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: theme.spacing(1),
+    marginBottom: theme.spacing(1.5),
+    '& .MuiSvgIcon-root': {
+      fontSize: '0.8rem',
+      marginTop: '6px',
+      color: theme.palette.primary.main,
+    },
   },
 }));
 
@@ -111,7 +172,6 @@ export const JobDetails = ({ jobId, onBack, authHeader }) => {
       showToast(response.data?.message || 'Applied successfully');
     } catch (err) {
       console.error('Error applying to job:', err);
-      // Get error message from different possible locations in the response
       const errorMessage = err.response?.data?.message || 
                           err.response?.data || 
                           err.message || 
@@ -165,7 +225,6 @@ export const JobDetails = ({ jobId, onBack, authHeader }) => {
       </Container>
     );
   }
-
   if (!job) return null;
 
   const daysUntilDeadline = getDaysUntilDeadline(job.deadlineDate);
@@ -176,51 +235,112 @@ export const JobDetails = ({ jobId, onBack, authHeader }) => {
         variant="outlined"
         startIcon={<ArrowBack />}
         onClick={onBack}
-        sx={{ mb: 2 }}
+        sx={{ mb: 3, borderRadius: '8px' }}
       >
         Back to Jobs
       </Button>
 
-      <StyledPaper elevation={2}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          {job.title}
-        </Typography>
+      <MainPaper elevation={0}>
+        <HeaderSection>
+          <Typography variant="h4" component="h1" fontWeight="600">
+            {job.title}
+          </Typography>
+          <CompanyTitle variant="h5">
+            {job.companyId.profile.companyName}
+          </CompanyTitle>
 
-        <Typography variant="h5" color="primary" gutterBottom>
-          {job.companyId.profile.companyName}
-        </Typography>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <StyledChip 
+              variant="salary"
+              icon={<AttachMoney />}
+              label={`${job.salary}`}
+            />
+            <StyledChip 
+              variant="deadline"
+              icon={<AccessTime />}
+              label={`${daysUntilDeadline} days left · Deadline: ${formatDate(job.deadlineDate)}`}
+            />
+          </Box>
+        </HeaderSection>
 
-        <Box sx={{ my: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <SalaryChip 
-            icon={<AttachMoney />}
-            label={`Salary: ${job.salary}`}
-          />
-          <DeadlineChip 
-            icon={<AccessTime />}
-            label={`${daysUntilDeadline} days left · Deadline: ${formatDate(job.deadlineDate)}`}
-          />
-        </Box>
-
-        <Box sx={{ my: 3 }}>
+        <InfoGrid>
           <InfoItem>
-            <LocationOn color="action" />
+            <LocationOn />
             <Typography>{job.location}</Typography>
           </InfoItem>
-
           <InfoItem>
-            <WorkHistory color="action" />
+            <WorkHistory />
             <Typography>{job.experienceLevel}</Typography>
           </InfoItem>
+          <InfoItem>
+            <Work />
+            <Typography>{job.employmentType}</Typography>
+          </InfoItem>
+          <InfoItem>
+            <Groups />
+            <Typography>{job.openings} Position(s) Available</Typography>
+          </InfoItem>
+          <InfoItem>
+            <Business />
+            <Typography>{job.companyId.profile.industry}</Typography>
+          </InfoItem>
+          <InfoItem>
+            <Language />
+            <Link 
+              href={job.companyId.profile.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ color: 'inherit', textDecoration: 'none' }}
+            >
+              {job.companyId.profile.website}
+            </Link>
+          </InfoItem>
+        </InfoGrid>
+
+        <Divider sx={{ my: 4 }} />
+
+        <Box>
+          <SectionTitle variant="h6">
+            Job Description
+          </SectionTitle>
+          <Typography paragraph sx={{ color: 'text.secondary', lineHeight: 1.7 }}>
+            {job.description}
+          </Typography>
+
+          <SectionTitle variant="h6">
+            Requirements
+          </SectionTitle>
+          <RequirementList>
+            {job.requirements.map((requirement, index) => (
+              <Box key={index}>
+                <Circle />
+                <Typography sx={{ color: 'text.secondary' }}>
+                  {requirement}
+                </Typography>
+              </Box>
+            ))}
+          </RequirementList>
+
+          <SectionTitle variant="h6">
+            Job Highlights
+          </SectionTitle>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+            {job.jobHighlights.map((highlight, index) => (
+              <StyledChip key={index} variant="highlight" label={highlight} />
+            ))}
+          </Box>
+
+          <SectionTitle variant="h6">
+            Key Skills
+          </SectionTitle>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 4 }}>
+            {job.keySkills.map((skill, index) => (
+              <StyledChip key={index} variant="skill" label={skill} />
+            ))}
+          </Box>
         </Box>
 
-        <Divider sx={{ my: 3 }} />
-
-        <Typography variant="h6" gutterBottom>
-          Job Description
-        </Typography>
-        <Typography paragraph>{job.description}</Typography>
-
-        <Box sx={{ mt: 4 }}>
+        <Box sx={{ mt: 6 }}>
           <Button
             variant="contained"
             color="primary"
@@ -228,6 +348,12 @@ export const JobDetails = ({ jobId, onBack, authHeader }) => {
             fullWidth
             disabled={daysUntilDeadline <= 0 || applyLoading}
             onClick={handleApply}
+            sx={{
+              py: 1.5,
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontSize: '1.1rem',
+            }}
           >
             {applyLoading ? (
               <CircularProgress size={24} color="inherit" />
@@ -238,7 +364,7 @@ export const JobDetails = ({ jobId, onBack, authHeader }) => {
             )}
           </Button>
         </Box>
-      </StyledPaper>
+      </MainPaper>
 
       <Snackbar
         open={snackbarOpen}

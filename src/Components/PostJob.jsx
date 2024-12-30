@@ -1,163 +1,294 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, useMediaQuery } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { Add, Send, Visibility } from '@mui/icons-material';
-import axios from 'axios';
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  Grid,
+  IconButton,
+  TextField,
+  Typography,
+  Chip,
+} from "@mui/material";
+import {
+  LocationOn,
+  Work,
+  Group,
+  School,
+  AttachMoney,
+  CalendarToday,
+  Description,
+  Add,
+  Close,
+} from "@mui/icons-material";
 
-// Import modular components
-import PostJobForm from './JobPostingForm/PostJobForm';
-import JobAlertForm from './JobPostingForm/JobAlertForm';
-import ViewJobs from './JobPostingForm/viewJob';
+const JobPostingForm = () => {
+  const [formData, setFormData] = useState({
+    title: "",
+    location: "",
+    openings: "",
+    employmentType: "",
+    experienceLevel: "",
+    salary: "",
+    deadlineDate: "",
+    description: "",
+    jobHighlights: [],
+    requirements: [],
+    keySkills: [],
+  });
 
-const JobPostingPage = () => {
-  const [activeForm, setActiveForm] = useState('');
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [tempInputs, setTempInputs] = useState({
+    highlight: "",
+    requirement: "",
+    skill: "",
+  });
 
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const styles = {
-    root: {
-      marginTop: '4vh',
-      display: 'flex',
-      flexDirection: isSmallScreen ? 'column' : 'row',
-      padding: '10px',
-      maxHeight: '75vh',
-    },
-    sidebar: {
-      width: isSmallScreen ? '100%' : '250px',
-      padding: '20px',
-      backgroundColor: '#fff',
-      borderRight: isSmallScreen ? 'none' : '1px solid #e0e0e0',
-      marginBottom: isSmallScreen ? '20px' : '0',
-    },
-    mainContent: {
-      flex: 1,
-      padding: '20px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'flex-start', // Changed to flex-start to avoid stretching
-      overflowY: 'auto', // Added scroll for overflow
-    },
-    card: {
-      width: '100%',
-      maxWidth: isSmallScreen ? '100%' : '800px', // Increased max width
-      position: 'relative',
-    },
-    closeButton: {
-      position: 'absolute',
-      right: 8,
-      top: 8,
-    },
-    form: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '16px',
-    },
-    buttonContainer: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '10px',
-    },
-    list: {
-      width: '100%',
-      backgroundColor: theme.palette.background.paper,
-      maxHeight: '0vh', // Added max height
-      overflowY: 'auto', // Added scroll
-    },
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Fetch jobs when component mounts or activeForm changes to 'viewJobs'
-  useEffect(() => {
-    if (activeForm === 'viewJobs') {
-      fetchPostedJobs();
-    }
-  }, [activeForm]);
-
-  const fetchPostedJobs = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await axios.get('http://localhost:5000/jobs/all', {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      console.log('Fetched jobs:', response.data);
-      setJobs(response.data);
-    } catch (err) {
-      console.error('Error fetching jobs:', err);
-      setError(`Failed to fetch jobs: ${err.message}`);
-    } finally {
-      setLoading(false);
+  const handleAddItem = (field, value) => {
+    if (value.trim() && !formData[field].includes(value.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: [...prev[field], value.trim()],
+      }));
+      setTempInputs((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
-  const renderForm = () => {
-    switch (activeForm) {
-      case 'postJob':
-        return <PostJobForm onClose={() => setActiveForm('')} styles={styles} />;
-      case 'sendJobAlert':
-        return <JobAlertForm onClose={() => setActiveForm('')} styles={styles} />;
-      case 'viewJobs':
-        return (
-          <ViewJobs
-            jobs={jobs}
-            loading={loading}
-            error={error}
-            onClose={() => setActiveForm('')}
-            styles={styles}
-            onRefresh={fetchPostedJobs} // Added refresh capability
-          />
-        );
-      default:
-        return null;
-    }
+  const handleRemoveItem = (field, index) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form Submitted", formData);
   };
 
   return (
-    <Box sx={styles.root}>
-      {/* Sidebar */}
-      <Box sx={styles.sidebar}>
-        <Box sx={styles.buttonContainer}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Add />}
-            onClick={() => setActiveForm('postJob')}
-            fullWidth
-          >
-            Post Job
-          </Button>
+    <Box maxWidth="md" mx="auto" p={2}>
+      <Card>
+        <CardHeader
+          title={<Typography variant="h5">Post a New Job</Typography>}
+        />
+        <Divider />
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Job Title"
+                  fullWidth
+                  value={formData.title}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  InputProps={{
+                    startAdornment: <Work fontSize="small" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Location"
+                  fullWidth
+                  value={formData.location}
+                  onChange={(e) => handleInputChange("location", e.target.value)}
+                  InputProps={{
+                    startAdornment: <LocationOn fontSize="small" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Number of Openings"
+                  fullWidth
+                  type="number"
+                  value={formData.openings}
+                  onChange={(e) => handleInputChange("openings", e.target.value)}
+                  InputProps={{
+                    startAdornment: <Group fontSize="small" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Employment Type"
+                  fullWidth
+                  value={formData.employmentType}
+                  onChange={(e) => handleInputChange("employmentType", e.target.value)}
+                  placeholder="e.g., Full-time, Part-time"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Experience Level"
+                  fullWidth
+                  value={formData.experienceLevel}
+                  onChange={(e) => handleInputChange("experienceLevel", e.target.value)}
+                  placeholder="e.g., Entry, Mid, Senior"
+                  InputProps={{
+                    startAdornment: <School fontSize="small" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Salary Range"
+                  fullWidth
+                  value={formData.salary}
+                  onChange={(e) => handleInputChange("salary", e.target.value)}
+                  placeholder="e.g., $80,000 - $100,000"
+                  InputProps={{
+                    startAdornment: <AttachMoney fontSize="small" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Application Deadline"
+                  fullWidth
+                  type="date"
+                  value={formData.deadlineDate}
+                  onChange={(e) => handleInputChange("deadlineDate", e.target.value)}
+                  InputProps={{
+                    startAdornment: <CalendarToday fontSize="small" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Job Description"
+                  fullWidth
+                  multiline
+                  rows={4}
+                  value={formData.description}
+                  onChange={(e) => handleInputChange("description", e.target.value)}
+                  InputProps={{
+                    startAdornment: <Description fontSize="small" />,
+                  }}
+                />
+              </Grid>
 
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Send />}
-            onClick={() => setActiveForm('sendJobAlert')}
-            fullWidth
-          >
-            Send Job Alert
-          </Button>
+              {/* Job Highlights */}
+              <Grid item xs={12}>
+                <TextField
+                  label="Add Job Highlights"
+                  fullWidth
+                  value={tempInputs.highlight}
+                  onChange={(e) =>
+                    setTempInputs((prev) => ({ ...prev, highlight: e.target.value }))
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddItem("jobHighlights", tempInputs.highlight);
+                    }
+                  }}
+                />
+                <IconButton
+                  onClick={() => handleAddItem("jobHighlights", tempInputs.highlight)}
+                >
+                  <Add />
+                </IconButton>
+                <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
+                  {formData.jobHighlights.map((highlight, index) => (
+                    <Chip
+                      key={index}
+                      label={highlight}
+                      onDelete={() => handleRemoveItem("jobHighlights", index)}
+                      deleteIcon={<Close />}
+                    />
+                  ))}
+                </Box>
+              </Grid>
 
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Visibility />}
-            onClick={() => setActiveForm('viewJobs')}
-            fullWidth
-          >
-            View Posted Jobs
-          </Button>
-        </Box>
-      </Box>
+              {/* Requirements */}
+              <Grid item xs={12}>
+                <TextField
+                  label="Add Requirements"
+                  fullWidth
+                  value={tempInputs.requirement}
+                  onChange={(e) =>
+                    setTempInputs((prev) => ({ ...prev, requirement: e.target.value }))
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddItem("requirements", tempInputs.requirement);
+                    }
+                  }}
+                />
+                <IconButton
+                  onClick={() => handleAddItem("requirements", tempInputs.requirement)}
+                >
+                  <Add />
+                </IconButton>
+                <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
+                  {formData.requirements.map((req, index) => (
+                    <Chip
+                      key={index}
+                      label={req}
+                      onDelete={() => handleRemoveItem("requirements", index)}
+                      deleteIcon={<Close />}
+                    />
+                  ))}
+                </Box>
+              </Grid>
 
-      {/* Main Content */}
-      <Box sx={styles.mainContent}>{renderForm()}</Box>
+              {/* Key Skills */}
+              <Grid item xs={12}>
+                <TextField
+                  label="Add Key Skills"
+                  fullWidth
+                  value={tempInputs.skill}
+                  onChange={(e) =>
+                    setTempInputs((prev) => ({ ...prev, skill: e.target.value }))
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddItem("keySkills", tempInputs.skill);
+                    }
+                  }}
+                />
+                <IconButton
+                  onClick={() => handleAddItem("keySkills", tempInputs.skill)}
+                >
+                  <Add />
+                </IconButton>
+                <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
+                  {formData.keySkills.map((skill, index) => (
+                    <Chip
+                      key={index}
+                      label={skill}
+                      onDelete={() => handleRemoveItem("keySkills", index)}
+                      deleteIcon={<Close />}
+                    />
+                  ))}
+                </Box>
+              </Grid>
+            </Grid>
+
+            <Box mt={3}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+              >
+                Post Job
+              </Button>
+            </Box>
+          </form>
+        </CardContent>
+      </Card>
     </Box>
   );
 };
 
-export default JobPostingPage;
+export default JobPostingForm;
