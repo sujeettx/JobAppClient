@@ -6,7 +6,7 @@ import Footer from './Components/Fotter';
 import HomePage from './Components/HomePage';
 import Auth from './Components/AuthPage';
 import NotFoundPage from './Components/NotFound';
-// import Dashboard from './Components/DashBoard';
+import Dashboard from './Components/DashBoard';
 import PostJob from './Components/PostJob';
 import FindJobs from './Components/FindJobs';
 import JobList from './Components/JobList';
@@ -27,7 +27,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<Auth />} />
-            {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/signup" element={<Auth />} />
             <Route path="/post-job" element={<PostJob />} />
             <Route path="/view-jobs" element={<FindJobs />} />
