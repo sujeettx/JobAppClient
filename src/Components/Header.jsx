@@ -145,6 +145,7 @@ const Header = () => {
         { text: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> },
         { text: 'Post Job', href: '/post-job', icon: <BusinessIcon /> },
         { text: 'Applicants', href: '/applicants', icon: <AssignmentIcon /> },
+        { text: 'View posted job', href: '/job-list', icon: <WorkIcon /> },   
       ];
     }
     

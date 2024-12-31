@@ -9,6 +9,7 @@ import NotFoundPage from './Components/NotFound';
 // import Dashboard from './Components/DashBoard';
 import PostJob from './Components/PostJob';
 import FindJobs from './Components/FindJobs';
+import JobList from './Components/JobList';
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
             <Route path="/signup" element={<Auth />} />
             <Route path="/post-job" element={<PostJob />} />
             <Route path="/view-jobs" element={<FindJobs />} />
+            <Route path="/job-list" element={<JobList />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <Footer />
