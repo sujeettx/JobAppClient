@@ -30,8 +30,10 @@ import {
   Edit as EditIcon,
   Business,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const JobListings = () => {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState({
@@ -137,7 +139,7 @@ const JobListings = () => {
                       <Box>
                         <IconButton
                           color="primary"
-                          onClick={() => console.log("Edit job:", job._id)}
+                          onClick={() =>navigate(`/edit-job/${job._id}`)}
                           sx={{ mr: 1 }}
                         >
                           <EditIcon />
