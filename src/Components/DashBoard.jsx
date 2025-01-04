@@ -44,7 +44,12 @@ const Dashboard = () => {
     const role = sessionStorage.getItem('userRole');
     if (role === 'company'){
       return (
-        <Button onClick={() => navigate('/update-profile')}>
+        <Button 
+        onClick={() => navigate('/update-profile')}
+        variant="contained"
+          color="primary"
+          sx={{ mt: 3 }}
+        >
           update profile
         </Button>
       )
