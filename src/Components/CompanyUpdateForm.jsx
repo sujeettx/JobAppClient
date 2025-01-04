@@ -8,8 +8,10 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const UpdateCompanyProfile = () => {
+  const navigate = useNavigate();
   const userId = sessionStorage.getItem('userId'); // Get userId from sessionStorage
   const [profileData, setProfileData] = useState({
     logo: '',
@@ -52,6 +54,7 @@ const UpdateCompanyProfile = () => {
     try {
       await axios.patch(`http://localhost:8080/users/${userId}`, { profile: profileData });
       toast.success('Company profile updated successfully!');
+      setTimeout(()=>{navigate('/dashboard')},2000)
     } catch (error) {
       toast.error('Failed to update company profile: ', error.message);
     }

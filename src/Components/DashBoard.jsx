@@ -11,7 +11,8 @@ import {
   Link,
   Skeleton,
   Typography,
-  Alert
+  Alert,
+  Button
 } from '@mui/material';
 import {
   Email,
@@ -30,12 +31,25 @@ import {
   Twitter,
   LinkedIn
 } from '@mui/icons-material';
+import {useNavigate} from 'react-router-dom'
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const userRole = sessionStorage.getItem('userRole');
+
+  const navigate = useNavigate();
+  const showButton = () => {
+    const role = sessionStorage.getItem('userRole');
+    if (role === 'company'){
+      return (
+        <Button onClick={() => navigate('/update-profile')}>
+          update profile
+        </Button>
+      )
+    }
+  }
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -425,6 +439,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       )}
+      {showButton()}
     </Container>
   );
 };
