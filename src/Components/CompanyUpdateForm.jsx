@@ -7,6 +7,7 @@ import {
   Box,
 } from '@mui/material';
 import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 
 const UpdateCompanyProfile = () => {
   const userId = sessionStorage.getItem('userId'); // Get userId from sessionStorage
@@ -33,7 +34,7 @@ const UpdateCompanyProfile = () => {
         const response = await axios.get(`http://localhost:8080/users/${userId}`);
         setProfileData(response.data.profile);
       } catch (error) {
-        console.error('Error fetching company data:', error);
+        toast.error(error || "error getting company data")
       }
     };
     fetchData();
@@ -50,10 +51,9 @@ const UpdateCompanyProfile = () => {
   const handleSubmit = async () => {
     try {
       await axios.patch(`http://localhost:8080/users/${userId}`, { profile: profileData });
-      alert('Company profile updated successfully!');
+      toast.success('Company profile updated successfully!');
     } catch (error) {
-      console.error('Error updating company profile:', error);
-      alert('Failed to update company profile.');
+      toast.error('Failed to update company profile: ', error.message);
     }
   };
 
@@ -225,6 +225,7 @@ const UpdateCompanyProfile = () => {
         >
           Update
         </Button>
+        <Toaster position="top-right" reverseOrder={false} />
       </Box>
     </Container>
   );
