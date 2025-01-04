@@ -6,12 +6,14 @@ import {
   Typography,
   Container,
   Box,
+  CircularProgress
 } from '@mui/material';
-import axios from 'axios';
 
 const UpdateStudentProfile = () => {
-  const userId = sessionStorage.getItem('userId'); // Get userId from sessionStorage
-  const [profileData, setProfileData] = useState({
+  const userId = sessionStorage.getItem('userId');
+  
+  // Move initialState outside component to prevent recreation on each render
+  const initialState = {
     profileImage: '',
     education: [{ degree: '', university: '', year: '', grade: '' }],
     projects: [{ name: '', description: '', link: '', technologies: [] }],
@@ -20,35 +22,95 @@ const UpdateStudentProfile = () => {
     dob: '',
     languages: [],
     location: '',
-    phoneNumber: '',
-  });
+    phoneNumber: ''
+  };
 
-  // Fetch user data (optional, if needed to pre-fill the form)
+  // Initialize state only once
+  const [profileData, setProfileData] = useState(initialState);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
+
   useEffect(() => {
+    let isMounted = true;
+
     const fetchData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8080/users/${userId}`);
-        setProfileData(response.data.profile);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
+      if (!isInitialized) {
+        try {
+          const response = await fetch(`http://localhost:8080/users/${userId}`);
+          const data = await response.json();
+          
+          if (isMounted) {
+            if (data.profile) {
+              setProfileData(prevData => ({
+                ...prevData,
+                ...data.profile,
+                education: data.profile.education?.length ? 
+                  data.profile.education : prevData.education,
+                projects: data.profile.projects?.length ? 
+                  data.profile.projects : prevData.projects,
+                socialLinks: {
+                  ...prevData.socialLinks,
+                  ...(data.profile.socialLinks || {})
+                },
+                languages: Array.isArray(data.profile.languages) ? 
+                  data.profile.languages : []
+              }));
+            }
+            setIsInitialized(true);
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        } finally {
+          if (isMounted) {
+            setIsLoading(false);
+          }
+        }
       }
     };
+    
     fetchData();
-  }, [userId]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [userId, isInitialized]);
 
   const handleInputChange = (field, value) => {
-    setProfileData({ ...profileData, [field]: value });
+    setProfileData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleNestedInputChange = (key, index, field, value) => {
-    const updatedArray = [...profileData[key]];
-    updatedArray[index][field] = value;
-    setProfileData({ ...profileData, [key]: updatedArray });
+    setProfileData(prev => {
+      const updatedArray = [...prev[key]];
+      updatedArray[index] = {
+        ...updatedArray[index],
+        [field]: value
+      };
+      return { ...prev, [key]: updatedArray };
+    });
+  };
+
+  const handleSocialLinksChange = (platform, value) => {
+    setProfileData(prev => ({
+      ...prev,
+      socialLinks: {
+        ...prev.socialLinks,
+        [platform]: value
+      }
+    }));
   };
 
   const handleSubmit = async () => {
     try {
-      await axios.patch(`http://localhost:8080/users/${userId}`, { profile: profileData });
+      const response = await fetch(`http://localhost:8080/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ profile: profileData })
+      });
+      
+      if (!response.ok) throw new Error('Failed to update profile');
       alert('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -56,20 +118,30 @@ const UpdateStudentProfile = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
         Update Profile
       </Typography>
-      <Box component="form" noValidate>
+      
+      <Box component="form" noValidate sx={{ mt: 3 }}>
         <TextField
           fullWidth
           label="Profile Image URL"
-          value={profileData.profileImage}
+          value={profileData.profileImage || ''}
           onChange={(e) => handleInputChange('profileImage', e.target.value)}
           margin="normal"
         />
-        <Typography variant="h6" gutterBottom>
+
+        <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
           Education
         </Typography>
         {profileData.education.map((edu, index) => (
@@ -78,7 +150,7 @@ const UpdateStudentProfile = () => {
               <TextField
                 fullWidth
                 label="Degree"
-                value={edu.degree}
+                value={edu.degree || ''}
                 onChange={(e) =>
                   handleNestedInputChange('education', index, 'degree', e.target.value)
                 }
@@ -89,7 +161,7 @@ const UpdateStudentProfile = () => {
               <TextField
                 fullWidth
                 label="University"
-                value={edu.university}
+                value={edu.university || ''}
                 onChange={(e) =>
                   handleNestedInputChange('education', index, 'university', e.target.value)
                 }
@@ -100,7 +172,7 @@ const UpdateStudentProfile = () => {
               <TextField
                 fullWidth
                 label="Year"
-                value={edu.year}
+                value={edu.year || ''}
                 onChange={(e) =>
                   handleNestedInputChange('education', index, 'year', e.target.value)
                 }
@@ -111,7 +183,7 @@ const UpdateStudentProfile = () => {
               <TextField
                 fullWidth
                 label="Grade"
-                value={edu.grade}
+                value={edu.grade || ''}
                 onChange={(e) =>
                   handleNestedInputChange('education', index, 'grade', e.target.value)
                 }
@@ -120,7 +192,8 @@ const UpdateStudentProfile = () => {
             </Grid>
           </Grid>
         ))}
-        <Typography variant="h6" gutterBottom>
+
+        <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
           Projects
         </Typography>
         {profileData.projects.map((project, index) => (
@@ -128,7 +201,7 @@ const UpdateStudentProfile = () => {
             <TextField
               fullWidth
               label="Project Name"
-              value={project.name}
+              value={project.name || ''}
               onChange={(e) =>
                 handleNestedInputChange('projects', index, 'name', e.target.value)
               }
@@ -137,7 +210,7 @@ const UpdateStudentProfile = () => {
             <TextField
               fullWidth
               label="Description"
-              value={project.description}
+              value={project.description || ''}
               onChange={(e) =>
                 handleNestedInputChange('projects', index, 'description', e.target.value)
               }
@@ -146,7 +219,7 @@ const UpdateStudentProfile = () => {
             <TextField
               fullWidth
               label="Link"
-              value={project.link}
+              value={project.link || ''}
               onChange={(e) =>
                 handleNestedInputChange('projects', index, 'link', e.target.value)
               }
@@ -154,70 +227,72 @@ const UpdateStudentProfile = () => {
             />
           </Box>
         ))}
-        <Typography variant="h6" gutterBottom>
+
+        <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
           Social Links
         </Typography>
-        {['linkedin', 'github', 'twitter'].map((platform) => (
+        {Object.keys(profileData.socialLinks).map((platform) => (
           <TextField
             key={platform}
             fullWidth
             label={platform.charAt(0).toUpperCase() + platform.slice(1)}
-            value={profileData.socialLinks[platform]}
-            onChange={(e) =>
-              setProfileData({
-                ...profileData,
-                socialLinks: { ...profileData.socialLinks, [platform]: e.target.value },
-              })
-            }
+            value={profileData.socialLinks[platform] || ''}
+            onChange={(e) => handleSocialLinksChange(platform, e.target.value)}
             margin="normal"
           />
         ))}
+
         <TextField
           fullWidth
           label="Gender"
-          value={profileData.gender}
+          value={profileData.gender || ''}
           onChange={(e) => handleInputChange('gender', e.target.value)}
           margin="normal"
         />
+
         <TextField
           fullWidth
           label="Date of Birth"
-          value={profileData.dob}
+          type="date"
+          value={profileData.dob || ''}
           onChange={(e) => handleInputChange('dob', e.target.value)}
           margin="normal"
-          type="date"
           InputLabelProps={{ shrink: true }}
         />
+
         <TextField
           fullWidth
           label="Languages (comma-separated)"
           value={profileData.languages.join(', ')}
           onChange={(e) =>
-            handleInputChange('languages', e.target.value.split(',').map((lang) => lang.trim()))
+            handleInputChange('languages', e.target.value.split(',').map(lang => lang.trim()))
           }
           margin="normal"
         />
+
         <TextField
           fullWidth
           label="Location"
-          value={profileData.location}
+          value={profileData.location || ''}
           onChange={(e) => handleInputChange('location', e.target.value)}
           margin="normal"
         />
+
         <TextField
           fullWidth
           label="Phone Number"
-          value={profileData.phoneNumber}
+          value={profileData.phoneNumber || ''}
           onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
           margin="normal"
         />
+
         <Button
           variant="contained"
           color="primary"
           onClick={handleSubmit}
           sx={{ mt: 3 }}
         >
-          Update
+          Update Profile
         </Button>
       </Box>
     </Container>

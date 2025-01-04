@@ -40,21 +40,14 @@ const Dashboard = () => {
   const userRole = sessionStorage.getItem('userRole');
 
   const navigate = useNavigate();
-  const showButton = () => {
-    const role = sessionStorage.getItem('userRole');
-    if (role === 'company'){
-      return (
-        <Button 
-        onClick={() => navigate('/update-profile')}
-        variant="contained"
-          color="primary"
-          sx={{ mt: 3 }}
-        >
-          update profile
-        </Button>
-      )
-    }
-  }
+  // const showButton = () => {
+  //   const role = sessionStorage.getItem('userRole');
+  //   if (role === 'student'){
+  //     return (
+  //       
+  //     )
+  //   }
+  // }
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -444,7 +437,14 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       )}
-      {showButton()}
+      <Button 
+        onClick={() => navigate('/update-profile')}
+        variant="contained"
+          color="primary"
+          sx={{ mt: 3 }}
+        >
+          update profile
+        </Button>
     </Container>
   );
 };

@@ -226,7 +226,7 @@ const UpdateCompanyProfile = () => {
           onClick={handleSubmit}
           sx={{ mt: 3 }}
         >
-          Update
+          Update Profile
         </Button>
         <Toaster position="top-right" reverseOrder={false} />
       </Box>
