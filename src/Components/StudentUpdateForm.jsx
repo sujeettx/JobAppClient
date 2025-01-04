@@ -8,9 +8,11 @@ import {
   Box,
   CircularProgress
 } from '@mui/material';
-
+import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 const UpdateStudentProfile = () => {
   const userId = sessionStorage.getItem('userId');
+  const navigate = useNavigate();
   
   // Move initialState outside component to prevent recreation on each render
   const initialState = {
@@ -111,7 +113,9 @@ const UpdateStudentProfile = () => {
       });
       
       if (!response.ok) throw new Error('Failed to update profile');
-      alert('Profile updated successfully!');
+      toast.success('student profile updated successfully!');
+    setTimeout(()=>{navigate('/dashboard')},2000)
+
     } catch (error) {
       console.error('Error updating profile:', error);
       alert('Failed to update profile.');
@@ -294,6 +298,7 @@ const UpdateStudentProfile = () => {
         >
           Update Profile
         </Button>
+        <Toaster position="top-right" reverseOrder={false} />
       </Box>
     </Container>
   );
