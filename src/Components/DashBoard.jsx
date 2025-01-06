@@ -115,10 +115,12 @@ const Dashboard = () => {
         <CardContent sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
             <Avatar
+              src={profile?.profileImage}
               sx={{ width: 100, height: 100, bgcolor: 'primary.light', fontSize: '2.5rem' }}
             >
               {profile?.fullName?.[0]?.toUpperCase() || '?'}
             </Avatar>
+
             <Box sx={{ flex: 1 }}>
               <Typography variant="h4" gutterBottom>
                 {profile?.fullName}
