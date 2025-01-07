@@ -7,13 +7,19 @@ import {
   Container,
   Typography,
   Grid,
-  Snackbar,
-  Alert,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Chip,
+  Stack,
 } from "@mui/material";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const EditJob = () => {
-  const { jobId } = useParams();
   const navigate = useNavigate();
+  const { jobId } = useParams();
   const token = sessionStorage.getItem("authToken");
   
   const [jobData, setJobData] = useState({
@@ -29,28 +35,31 @@ const EditJob = () => {
     highlights: [],
     keySkills: [],
   });
-  
-  const [loading, setLoading] = useState(true);
-  const [notification, setNotification] = useState({
-    open: false,
-    message: "",
-    type: "success",
+
+  const [tempInputs, setTempInputs] = useState({
+    requirements: "",
+    highlights: "",
+    keySkills: "",
   });
 
-  // Fetch job data when component mounts
+  const [loading, setLoading] = useState(true);
+
+  const experienceLevels = ['Entry Level', 'Mid Level', 'Senior Level', 'Expert Level'];
+  const employmentTypes = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Remote'];
+
   useEffect(() => {
     const fetchJobData = async () => {
       try {
-        if (!jobId || !token) {
-          navigate('/job-list');
-          return;
+        if (!token) {
+          throw new Error('No authentication token found');
         }
+console.log(token);
 
         const response = await fetch(`http://localhost:8080/jobs/${jobId}`, {
           method: 'GET',
           headers: {
-            'Authorization': `${token}`,
-            'Content-Type': 'application/json',
+            'Authorization': token,
+            'Content-Type': 'application/json'
           }
         });
 
@@ -59,56 +68,88 @@ const EditJob = () => {
         }
 
         const data = await response.json();
-        setJobData(data);
+        
+        const formattedData = {
+          ...data,
+          deadlineDate: data.deadlineDate ? new Date(data.deadlineDate).toISOString().split('T')[0] : '',
+          highlights: data.jobHighlights || data.highlights || [],
+        };
+        
+        setJobData(formattedData);
       } catch (error) {
-        console.error('Error:', error);
-        setNotification({
-          open: true,
-          message: "Failed to fetch job data",
-          type: "error",
-        });
+        console.error("Error fetching job data:", error);
+        toast.error('Failed to fetch job data');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchJobData();
-  }, [jobId, token, navigate]);
+    if (jobId) {
+      fetchJobData();
+    }
+  }, [jobId, token]);
 
   const handleInputChange = (field, value) => {
-    setJobData((prevData) => ({ ...prevData, [field]: value }));
+    setJobData(prevData => ({ ...prevData, [field]: value }));
+  };
+
+  const handleArrayInput = (field, event) => {
+    if (event.key === 'Enter' && tempInputs[field].trim() !== '') {
+      event.preventDefault();
+      setJobData(prevData => ({
+        ...prevData,
+        [field]: [...prevData[field], tempInputs[field].trim()]
+      }));
+      setTempInputs(prev => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const handleDeleteItem = (field, indexToDelete) => {
+    setJobData(prevData => ({
+      ...prevData,
+      [field]: prevData[field].filter((_, index) => index !== indexToDelete)
+    }));
   };
 
   const handleSubmit = async () => {
     try {
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
       const response = await fetch(`http://localhost:8080/jobs/${jobId}`, {
-        method: "Patch",
+        method: 'PATCH',
         headers: {
-          'Authorization': `${token}`,
+          'Authorization': token,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(jobData),
+        body: JSON.stringify({
+          ...jobData,
+          jobHighlights: jobData.highlights,
+        }),
       });
 
-      if (response.ok) {
-        setNotification({
-          open: true,
-          message: "Job updated successfully!",
-          type: "success",
-        });
-        // Navigate after successful update
-        setTimeout(() => {
-          navigate('/job-list');
-        }, 2000);
-      } else {
+      if (!response.ok) {
         throw new Error('Failed to update job');
       }
+
+      toast.success('Job updated successfully!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      setTimeout(() => {
+        navigate('/job-list');
+      }, 3000);
     } catch (error) {
-      console.error('Error:', error);
-      setNotification({
-        open: true,
-        message: "Failed to update job",
-        type: "error",
+      console.error("Error updating job:", error);
+      toast.error(error.message || 'Failed to update job', {
+        position: "top-right",
+        autoClose: 3000,
       });
     }
   };
@@ -128,7 +169,7 @@ const EditJob = () => {
           Edit Job
         </Typography>
         <Button
-          variant="outlined"
+          variant="contained"
           onClick={() => navigate('/job-list')}
         >
           Back to Job List
@@ -155,20 +196,36 @@ const EditJob = () => {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Experience Level"
-            value={jobData.experienceLevel}
-            onChange={(e) => handleInputChange("experienceLevel", e.target.value)}
-          />
+          <FormControl fullWidth>
+            <InputLabel>Experience Level</InputLabel>
+            <Select
+              value={jobData.experienceLevel}
+              label="Experience Level"
+              onChange={(e) => handleInputChange("experienceLevel", e.target.value)}
+            >
+              {experienceLevels.map((level) => (
+                <MenuItem key={level} value={level}>
+                  {level}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Employment Type"
-            value={jobData.employmentType}
-            onChange={(e) => handleInputChange("employmentType", e.target.value)}
-          />
+          <FormControl fullWidth>
+            <InputLabel>Employment Type</InputLabel>
+            <Select
+              value={jobData.employmentType}
+              label="Employment Type"
+              onChange={(e) => handleInputChange("employmentType", e.target.value)}
+            >
+              {employmentTypes.map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
@@ -207,42 +264,64 @@ const EditJob = () => {
             }}
           />
         </Grid>
+        
         <Grid item xs={12}>
           <TextField
             fullWidth
-            multiline
-            rows={2}
-            label="Highlights (comma separated)"
-            value={jobData.highlights.join(", ")}
-            onChange={(e) =>
-              handleInputChange("highlights", e.target.value.split(", "))
-            }
+            label="Add Highlights (Press Enter to add)"
+            value={tempInputs.highlights}
+            onChange={(e) => setTempInputs(prev => ({ ...prev, highlights: e.target.value }))}
+            onKeyPress={(e) => handleArrayInput("highlights", e)}
           />
+          <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
+            {jobData.highlights.map((highlight, index) => (
+              <Chip
+                key={index}
+                label={highlight}
+                onDelete={() => handleDeleteItem("highlights", index)}
+              />
+            ))}
+          </Stack>
         </Grid>
+
         <Grid item xs={12}>
           <TextField
             fullWidth
-            multiline
-            rows={2}
-            label="Key Skills (comma separated)"
-            value={jobData.keySkills.join(", ")}
-            onChange={(e) =>
-              handleInputChange("keySkills", e.target.value.split(", "))
-            }
+            label="Add Key Skills (Press Enter to add)"
+            value={tempInputs.keySkills}
+            onChange={(e) => setTempInputs(prev => ({ ...prev, keySkills: e.target.value }))}
+            onKeyPress={(e) => handleArrayInput("keySkills", e)}
           />
+          <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
+            {jobData.keySkills.map((skill, index) => (
+              <Chip
+                key={index}
+                label={skill}
+                onDelete={() => handleDeleteItem("keySkills", index)}
+              />
+            ))}
+          </Stack>
         </Grid>
+
         <Grid item xs={12}>
           <TextField
             fullWidth
-            multiline
-            rows={3}
-            label="Requirements (comma separated)"
-            value={jobData.requirements.join(", ")}
-            onChange={(e) =>
-              handleInputChange("requirements", e.target.value.split(", "))
-            }
+            label="Add Requirements (Press Enter to add)"
+            value={tempInputs.requirements}
+            onChange={(e) => setTempInputs(prev => ({ ...prev, requirements: e.target.value }))}
+            onKeyPress={(e) => handleArrayInput("requirements", e)}
           />
+          <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
+            {jobData.requirements.map((requirement, index) => (
+              <Chip
+                key={index}
+                label={requirement}
+                onDelete={() => handleDeleteItem("requirements", index)}
+              />
+            ))}
+          </Stack>
         </Grid>
+
         <Grid item xs={12}>
           <Box display="flex" justifyContent="flex-end">
             <Button
@@ -255,20 +334,8 @@ const EditJob = () => {
           </Box>
         </Grid>
       </Grid>
-
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={6000}
-        onClose={() => setNotification({ ...notification, open: false })}
-      >
-        <Alert
-          onClose={() => setNotification({ ...notification, open: false })}
-          severity={notification.type}
-          variant="filled"
-        >
-          {notification.message}
-        </Alert>
-      </Snackbar>
+      
+      <ToastContainer />
     </Container>
   );
 };

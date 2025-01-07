@@ -12,6 +12,7 @@ import PostJob from './Components/PostJob';
 import FindJobs from './Components/FindJobs';
 import JobList from './Components/JobList';
 import EditJob from './Components/EditJob';
+import Applicent from './Components/Applicent';
 
 const App = () => {
   return (
@@ -36,6 +37,7 @@ const App = () => {
             <Route path="/job-list" element={<JobList />} />
             <Route path="/update-profile" element={<UpdateProfileForm />} />
             <Route path="/edit-job/:jobId" element={<EditJob />} />
+            <Route path="/applicants" element={<Applicent />} /> 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <Footer />

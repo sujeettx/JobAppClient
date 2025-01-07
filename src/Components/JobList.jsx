@@ -293,6 +293,7 @@ const JobListings = () => {
         open={notification.open}
         autoHideDuration={6000}
         onClose={() => setNotification({ ...notification, open: false })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }} 
       >
         <Alert
           onClose={() => setNotification({ ...notification, open: false })}
