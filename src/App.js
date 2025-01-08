@@ -46,6 +46,7 @@ const PublicRoute = ({ children }) => {
 const App = () => {
   return (
     <Router>
+       <Header />
       <Box
         sx={{
           flexGrow: 1,
@@ -55,7 +56,6 @@ const App = () => {
           flexDirection: 'column',
         }}
       >
-        <Header />
         <Routes>
           {/* Public routes */}
           <Route
