@@ -16,6 +16,7 @@ import {
   Chip,
   Button,
 } from "@mui/material";
+import { Select, MenuItem } from "@mui/material";
 import {
   LocationOn,
   Work,
@@ -30,6 +31,8 @@ import {
 } from "@mui/icons-material";
 
 const JobPostingForm = () => {
+  const employmentTypes = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Remote'];
+  const experienceLevels = ['Entry Level', 'Mid Level', 'Senior Level', 'Expert Level'];
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: "", type: "success" });
   const [formData, setFormData] = useState({
@@ -222,30 +225,46 @@ const JobPostingForm = () => {
               </Grid>
 
               <Grid item xs={12} md={6}>
-                <TextField
-                  label="Employment Type"
-                  fullWidth
-                  required
-                  value={formData.employmentType}
-                  onChange={(e) => handleInputChange("employmentType", e.target.value)}
-                  InputProps={{
-                    startAdornment: <Business sx={{ mr: 1, color: "primary.main" }} />,
-                  }}
-                />
-              </Grid>
+  <Typography variant="subtitle1" gutterBottom>
+    Employment Type
+  </Typography>
+  <Select
+    fullWidth
+    value={formData.employmentType}
+    onChange={(e) => handleInputChange("employmentType", e.target.value)}
+    displayEmpty
+  >
+    <MenuItem value="" disabled>
+      Select Employment Type
+    </MenuItem>
+    {employmentTypes.map((type, index) => (
+      <MenuItem key={index} value={type}>
+        {type}
+      </MenuItem>
+    ))}
+  </Select>
+</Grid>
 
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Experience Level"
-                  fullWidth
-                  required
-                  value={formData.experienceLevel}
-                  onChange={(e) => handleInputChange("experienceLevel", e.target.value)}
-                  InputProps={{
-                    startAdornment: <School sx={{ mr: 1, color: "primary.main" }} />,
-                  }}
-                />
-              </Grid>
+             <Grid item xs={12} md={6}>
+  <Typography variant="subtitle1" gutterBottom>
+    Experience Level
+  </Typography>
+  <Select
+    fullWidth
+    value={formData.experienceLevel}
+    onChange={(e) => handleInputChange("experienceLevel", e.target.value)}
+    displayEmpty
+  >
+    <MenuItem value="" disabled>
+      Select Experience Level
+    </MenuItem>
+    {experienceLevels.map((level, index) => (
+      <MenuItem key={index} value={level}>
+        {level}
+      </MenuItem>
+    ))}
+  </Select>
+</Grid>
 
               <Grid item xs={12} md={6}>
                 <TextField
