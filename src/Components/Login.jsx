@@ -1,12 +1,35 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box, IconButton, Typography } from '@mui/material';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import axios from 'axios';
+import { Button, Box, Typography, Grid } from '@mui/material';
+// import { useNavigate } from 'react-router-dom';
+import LoginForm from './Login';
 
 const styles = {
+  formContainer: {
+    width: '100%',
+    maxWidth: '450px',
+    padding: { xs: 3, md: 4 },
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    border: '1px solid rgba(0, 0, 0, 0.06)',
+  },
+  marketingTitle: {
+    fontWeight: 700,
+    color: '#1e3a8a',
+    marginBottom: 3,
+    fontSize: { xs: '2rem', md: '2.5rem' },
+  },
+  marketingSubtitle: {
+    color: '#64748b',
+    marginBottom: 4,
+    maxWidth: '500px',
+    lineHeight: 1.6,
+  },
+  formTitle: {
+    fontWeight: 700,
+    marginBottom: 0.5,
+    textAlign: 'center',
+    color: '#2563eb',
+  },
   textField: {
     '& .MuiOutlinedInput-root': {
       borderRadius: 2,
@@ -31,128 +54,108 @@ const styles = {
       background: 'linear-gradient(45deg, #1d4ed8, #2563eb)',
     },
   },
+  navButton: {
+    marginTop: 2,
+    color: '#2563eb',
+    textTransform: 'none',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    '&:hover': {
+      backgroundColor: 'rgba(37, 99, 235, 0.04)',
+    },
+  },
   icon: {
     marginRight: 1,
     color: '#3b82f6'
+  },
+  chipContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 1,
+    marginTop: 1
   }
 };
 
-const LoginForm = ({ showPassword, togglePasswordVisibility }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [message, setMessage] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const LoginPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  // const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage('');
-    setIsSubmitting(true);
-
-    try {
-      const response = await axios.post('http://localhost:8080/users/login', formData);
-      
-      if (response.data.token) {
-        // Store token and role in sessionStorage for better security
-        sessionStorage.setItem('authToken', response.data.token);
-        sessionStorage.setItem('userRole', response.data.role);
-        sessionStorage.setItem('userId', response.data.userId);
-        
-        setMessage('Login successful!');
-        setIsSuccess(true);
-        
-        // Optional: Redirect or update UI state here
-        window.location.href = '/dashboard'; // or use navigation from your router
-      }
-    } catch (error) {
-      setIsSuccess(false);
-      setMessage(error.response?.data?.message || 'Login failed. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
-    <Box
-      component="form"
-      noValidate
-      autoComplete="off"
-      onSubmit={handleSubmit}
-      sx={{ marginTop: "5vh" }}
-    >
-      <TextField
-        fullWidth
-        size="small"
-        label="Email"
-        variant="outlined"
-        margin="dense"
-        sx={styles.textField}
-        name="email"
-        value={formData.email}
-        onChange={handleChange}
-        InputProps={{
-          startAdornment: <EmailIcon sx={styles.icon} />,
-        }}
-        disabled={isSubmitting}
-      />
-     
-      <TextField
-        fullWidth
-        size="small"
-        label="Password"
-        type={showPassword ? 'text' : 'password'}
-        variant="outlined"
-        margin="dense"
-        sx={styles.textField}
-        name="password"
-        value={formData.password}
-        onChange={handleChange}
-        InputProps={{
-          startAdornment: <LockIcon sx={styles.icon} />,
-          endAdornment: (
-            <IconButton
-              onClick={togglePasswordVisibility}
-              edge="end"
-              size="small"
-              disabled={isSubmitting}
-            >
-              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-            </IconButton>
-          ),
-        }}
-        disabled={isSubmitting}
-      />
-     
-      <Button
-        fullWidth
-        type="submit"
-        variant="contained"
-        sx={styles.submitButton}
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? 'Logging in...' : 'Login'}
-      </Button>
-      {message && (
-        <Typography
-          variant="body2"
+    <Box sx={{ minHeight: '30vh', display: 'flex' }}>
+      <Grid container sx={{ m: 0 }}>
+        <Grid
+          item
+          xs={12}
+          md={6}
           sx={{
-            marginTop: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            p: { xs: 2, md: 6 },
             textAlign: 'center',
-            color: isSuccess ? '#22c55e' : '#ff0000'
           }}
         >
-          {message}
-        </Typography>
-      )}
+          <Typography variant="h2" sx={styles.marketingTitle}>
+            Find Your Next<br />Great Opportunity
+          </Typography>
+          <Typography variant="h6" sx={styles.marketingSubtitle}>
+            Connect with top companies and build your career. Apply to jobs,
+            track applications, and find your dream role all in one place.
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+            p: { xs: 2, md: 6 },
+          }}
+        >
+          <Box sx={styles.formContainer}>
+            <Typography variant="h4" sx={styles.formTitle}>
+              Welcome Back
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ color: 'text.secondary', textAlign: 'center', mb: 3 }}
+            >
+              Login to access your account
+            </Typography>
+            
+            <LoginForm
+              showPassword={showPassword}
+              togglePasswordVisibility={togglePasswordVisibility}
+            />
+
+            <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Button
+                fullWidth
+                // onClick={() => navigate('/student-signup')}
+                sx={styles.button}
+              >
+                Don't have an account? Sign Up
+              </Button>
+              
+              <Button
+                fullWidth
+                // onClick={() => navigate('/company-signup')}
+                sx={styles.button}
+              >
+                Sign Up as a Company
+              </Button>
+            </Box>
+          </Box>
+        </Grid>
+      </Grid>
     </Box>
   );
 };
 
-export default LoginForm;
+export default LoginPage;
