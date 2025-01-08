@@ -10,7 +10,7 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon
 } from '@mui/icons-material';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const styles = {
@@ -81,7 +81,7 @@ const styles = {
 };
 
 const CompanySignupPage = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const initialFormState = {
@@ -162,7 +162,7 @@ const CompanySignupPage = () => {
       setMessage('Registration successful! Redirecting to login...');
       setIsSuccess(true);
       setFormData(initialFormState);
-      // setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate('/login'), 3000);
     } catch (error) {
       setIsSuccess(false);
       setMessage(error.response?.data?.message || 'Registration failed. Please try again.');
@@ -303,14 +303,14 @@ const CompanySignupPage = () => {
               <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <Button
                   fullWidth
-                  // onClick={() => navigate('/login')}
+                  onClick={() => navigate('/login')}
                   sx={styles.linkButton}
                 >
                   Already have an account? Login
                 </Button>
                 <Button
                   fullWidth
-                  // onClick={() => navigate('/signup')}
+                  onClick={() => navigate('/signup-student')}
                   sx={styles.linkButton}
                 >
                   Sign Up as a Student

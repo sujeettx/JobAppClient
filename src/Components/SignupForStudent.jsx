@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, IconButton, Chip, Stack, Grid } from '@mui/material';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Email as EmailIcon,
   Person as PersonIcon,
@@ -88,7 +88,7 @@ const styles = {
 };
 
 const StudentSignup = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const initialFormState = {
@@ -196,7 +196,7 @@ const StudentSignup = () => {
       setMessage('Registration successful! Redirecting to login...');
       setIsSuccess(true);
       setFormData(initialFormState);
-      // setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate('/login'), 3000);
     } catch (error) {
       setIsSuccess(false);
       setMessage(error.response?.data?.message || 'Registration failed. Please try again.');
@@ -422,7 +422,7 @@ const StudentSignup = () => {
               <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <Button
                   fullWidth
-                  // onClick={() => navigate('/login')}
+                  onClick={() => navigate('/login')}
                   sx={styles.navButton}
                 >
                   Already have an account? Login
@@ -430,7 +430,7 @@ const StudentSignup = () => {
                 
                 <Button
                   fullWidth
-                  // onClick={() => navigate('/company-signup')}
+                  onClick={() => navigate('/signup-company')}
                   sx={styles.navButton}
                 >
                   Sign Up as a Company

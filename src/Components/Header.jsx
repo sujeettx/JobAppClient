@@ -118,7 +118,7 @@ const Header = () => {
   };
 
   const handleSignUp = () => {
-    navigate('/signup');
+    navigate('/signup-student');
   };
 
   const handleLogout = () => {
