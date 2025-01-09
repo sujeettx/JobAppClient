@@ -21,13 +21,11 @@ import {
   LocationOn,
   Work,
   Group,
-  School,
   AttachMoney,
   CalendarToday,
   Description,
   Add,
   Close,
-  Business,
 } from "@mui/icons-material";
 
 const JobPostingForm = () => {
