@@ -18,8 +18,8 @@ import Applicent from './Components/Applicent';
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
-  const authToken = sessionStorage.getItem('authToken');
-  const userRole = sessionStorage.getItem('userRole');
+  const authToken = localStorage.getItem('authToken');
+  const userRole = localStorage.getItem('userRole');
   
   if (!authToken) {
     return <Navigate to="/login" />;
@@ -34,7 +34,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
 // Public Route wrapper component
 const PublicRoute = ({ children }) => {
-  const authToken = sessionStorage.getItem('authToken');
+  const authToken = localStorage.getItem('authToken');
   
   if (authToken) {
     return <Navigate to="/dashboard" />;

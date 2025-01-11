@@ -11,7 +11,7 @@ import {
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 const UpdateStudentProfile = () => {
-  const userId = sessionStorage.getItem('userId');
+  const userId = localStorage.getItem('userId');
   const navigate = useNavigate();
   
   // Move initialState outside component to prevent recreation on each render

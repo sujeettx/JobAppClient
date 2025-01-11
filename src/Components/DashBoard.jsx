@@ -37,11 +37,11 @@ const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const userRole = sessionStorage.getItem('userRole');
+  const userRole = localStorage.getItem('userRole');
 
   const navigate = useNavigate();
   // const showButton = () => {
-  //   const role = sessionStorage.getItem('userRole');
+  //   const role = localStorage.getItem('userRole');
   //   if (role === 'student'){
   //     return (
   //       
@@ -52,7 +52,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userId = sessionStorage.getItem('userId');
+        const userId = localStorage.getItem('userId');
         const response = await fetch(`http://localhost:8080/users/${userId}`);
         const data = await response.json();
         setUserData(data);

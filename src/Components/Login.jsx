@@ -98,9 +98,9 @@ const LoginPage = () => {
       
       // console.log('Login successful:', response.data);
       toast.success('Login successful!');
-      sessionStorage.setItem('authToken', response.data.token);
-      sessionStorage.setItem('userRole', response.data.role);
-      sessionStorage.setItem('userId', response.data.userId);
+      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('userRole', response.data.role);
+      localStorage.setItem('userId', response.data.userId);
       setTimeout(() => {
         navigate('/dashboard');
       }, 2000);

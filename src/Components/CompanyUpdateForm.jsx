@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 
 const UpdateCompanyProfile = () => {
   const navigate = useNavigate();
-  const userId = sessionStorage.getItem('userId'); // Get userId from sessionStorage
+  const userId = localStorage.getItem('userId'); // Get userId from sessionStorage
   const [profileData, setProfileData] = useState({
     logo: '',
     description: '',

@@ -41,8 +41,8 @@ const JobsDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userId = sessionStorage.getItem("userId");
-        const token = sessionStorage.getItem("authToken");
+        const userId = localStorage.getItem("userId");
+        const token = localStorage.getItem("authToken");
   
         if (!userId || !token) {
           throw new Error('Authentication credentials not found');

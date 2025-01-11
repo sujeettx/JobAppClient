@@ -79,7 +79,7 @@ const JobPostingForm = () => {
     setLoading(true);
 
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       if (!token) {
         throw new Error('Authentication token not found');
       }

@@ -20,7 +20,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const EditJob = () => {
   const navigate = useNavigate();
   const { jobId } = useParams();
-  const token = sessionStorage.getItem("authToken");
+  const token = localStorage.getItem("authToken");
   
   const [jobData, setJobData] = useState({
     title: "",

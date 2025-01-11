@@ -45,7 +45,7 @@ const FindJobs = () => {
 
   const getAuthHeader = () => ({
     headers: {
-      Authorization: sessionStorage.getItem('authToken'),
+      Authorization: localStorage.getItem('authToken'),
     },
   });
 

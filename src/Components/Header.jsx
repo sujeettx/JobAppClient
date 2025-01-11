@@ -147,7 +147,7 @@ const Header = () => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
   useEffect(() => {
-    const role = sessionStorage.getItem('userRole');
+    const role = localStorage.getItem('userRole');
     setUserRole(role);
     setCurrentPath(location.pathname);
   }, [location.pathname]);
@@ -161,9 +161,9 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('authToken');
-    sessionStorage.removeItem('userRole');
-    sessionStorage.removeItem('userId');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userId');
     setUserRole(null);
     navigate('/');
   };

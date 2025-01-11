@@ -52,8 +52,8 @@ const JobListings = () => {
 
   const fetchJobs = async () => {
     try {
-      const token = sessionStorage.getItem("authToken");
-      const companyId = sessionStorage.getItem("userId");
+      const token = localStorage.getItem("authToken");
+      const companyId = localStorage.getItem("userId");
 
       const response = await fetch(
         `http://localhost:8080/jobs/my/${companyId}`,
@@ -77,7 +77,7 @@ const JobListings = () => {
 
   const handleDelete = async (jobId) => {
     try {
-      const token = sessionStorage.getItem("authToken");
+      const token = localStorage.getItem("authToken");
       const response = await fetch(`http://localhost:8080/jobs/${jobId}`, {
         method: "DELETE",
         headers: {

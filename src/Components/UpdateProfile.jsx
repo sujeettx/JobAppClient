@@ -2,7 +2,7 @@ import React from 'react'
 import UpdateStudentProfile from './StudentUpdateForm'
 import UpdateCompanyProfile from './CompanyUpdateForm'
 function UpdateProfile() {
-    const userRole = sessionStorage.getItem('userRole')
+    const userRole = localStorage.getItem('userRole')
   return (
     <div>
        {userRole === 'student' ? <UpdateStudentProfile/> : <UpdateCompanyProfile/>}
