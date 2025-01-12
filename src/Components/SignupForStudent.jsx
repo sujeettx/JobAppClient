@@ -192,7 +192,7 @@ const StudentSignup = () => {
     setMessage('');
 
     try {
-      await axios.post('http://localhost:8080/users/register', formData);
+      await axios.post('http://https://job-box-server-fn4k.onrender.com/users/register', formData);
       setMessage('Registration successful! Redirecting to login...');
       setIsSuccess(true);
       setFormData(initialFormState);

@@ -55,7 +55,7 @@ const EditJob = () => {
         }
 console.log(token);
 
-        const response = await fetch(`http://localhost:8080/jobs/${jobId}`, {
+        const response = await fetch(`http://https://job-box-server-fn4k.onrender.com/jobs/${jobId}`, {
           method: 'GET',
           headers: {
             'Authorization': token,
@@ -117,7 +117,7 @@ console.log(token);
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch(`http://localhost:8080/jobs/${jobId}`, {
+      const response = await fetch(`http://https://job-box-server-fn4k.onrender.com/jobs/${jobId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': token,

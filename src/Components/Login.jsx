@@ -91,7 +91,7 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/users/login', {
+      const response = await axios.post('http://https://job-box-server-fn4k.onrender.com/users/login', {
         email: formData.email,
         password: formData.password
       });
