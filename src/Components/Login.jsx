@@ -103,7 +103,7 @@ const LoginPage = () => {
       localStorage.setItem('userId', response.data.userId);
       setTimeout(() => {
         navigate('/dashboard');
-      }, 2000);
+      }, 1500);
     } catch (error) {
       console.error('Login error:', error);
       toast.error(error.response?.data?.message || 'Login failed');

@@ -29,14 +29,43 @@ const UpdateCompanyProfile = () => {
     contact: { phone: '', hr: '' },
   });
 
-  // Fetch company data (optional, if needed to pre-fill the form)
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:8080/users/${userId}`);
-        setProfileData(response.data.profile);
+        // Merge the API response with default values
+        setProfileData(prevState => ({
+          ...prevState,
+          ...(response.data.profile || {}),
+          mainServices: response.data.profile?.mainServices || [],
+          headquarters: {
+            address: '',
+            pinCode: '',
+            ...(response.data.profile?.headquarters || {})
+          },
+          socialLinks: {
+            linkedin: '',
+            twitter: '',
+            ...(response.data.profile?.socialLinks || {})
+          },
+          companyInfo: {
+            type: '',
+            parentCompany: '',
+            stockSymbols: {
+              bse: '',
+              nse: '',
+              ...(response.data.profile?.companyInfo?.stockSymbols || {})
+            },
+            ...(response.data.profile?.companyInfo || {})
+          },
+          contact: {
+            phone: '',
+            hr: '',
+            ...(response.data.profile?.contact || {})
+          }
+        }));
       } catch (error) {
-        toast.error(error || "error getting company data")
+        toast.error(error?.message || "Error getting company data");
       }
     };
     fetchData();
@@ -47,14 +76,20 @@ const UpdateCompanyProfile = () => {
   };
 
   const handleNestedInputChange = (key, field, value) => {
-    setProfileData({ ...profileData, [key]: { ...profileData[key], [field]: value } });
+    setProfileData(prevState => ({
+      ...prevState,
+      [key]: {
+        ...(prevState[key] || {}),
+        [field]: value
+      }
+    }));
   };
 
   const handleSubmit = async () => {
     try {
       await axios.patch(`http://localhost:8080/users/${userId}`, { profile: profileData });
       toast.success('Company profile updated successfully!');
-      setTimeout(()=>{navigate('/dashboard')},2000)
+      setTimeout(() => { navigate('/dashboard') }, 2000)
     } catch (error) {
       toast.error('Failed to update company profile: ', error.message);
     }
@@ -97,7 +132,7 @@ const UpdateCompanyProfile = () => {
         <TextField
           fullWidth
           label="Main Services (comma-separated)"
-          value={profileData.mainServices.join(', ')}
+          value={profileData?.mainServices?.join(', ') || ''}
           onChange={(e) =>
             handleInputChange('mainServices', e.target.value.split(',').map((service) => service.trim()))
           }
@@ -109,7 +144,7 @@ const UpdateCompanyProfile = () => {
         <TextField
           fullWidth
           label="Address"
-          value={profileData.headquarters.address}
+          value={profileData?.headquarters?.address || ''}
           onChange={(e) =>
             handleNestedInputChange('headquarters', 'address', e.target.value)
           }
@@ -132,7 +167,7 @@ const UpdateCompanyProfile = () => {
             key={platform}
             fullWidth
             label={platform.charAt(0).toUpperCase() + platform.slice(1)}
-            value={profileData.socialLinks[platform]}
+            value={profileData?.socialLinks?.[platform] || ''}
             onChange={(e) =>
               setProfileData({
                 ...profileData,
@@ -148,7 +183,7 @@ const UpdateCompanyProfile = () => {
         <TextField
           fullWidth
           label="Type"
-          value={profileData.companyInfo.type}
+          value={profileData?.companyInfo?.type || ''}
           onChange={(e) =>
             handleNestedInputChange('companyInfo', 'type', e.target.value)
           }
@@ -157,7 +192,7 @@ const UpdateCompanyProfile = () => {
         <TextField
           fullWidth
           label="Parent Company"
-          value={profileData.companyInfo.parentCompany}
+          value={profileData?.companyInfo?.parentCompany || ''}
           onChange={(e) =>
             handleNestedInputChange('companyInfo', 'parentCompany', e.target.value)
           }
@@ -166,7 +201,7 @@ const UpdateCompanyProfile = () => {
         <TextField
           fullWidth
           label="BSE Stock Symbol"
-          value={profileData.companyInfo.stockSymbols.bse}
+          value={profileData?.companyInfo?.stockSymbols?.bse || ''}
           onChange={(e) =>
             setProfileData({
               ...profileData,
@@ -184,7 +219,7 @@ const UpdateCompanyProfile = () => {
         <TextField
           fullWidth
           label="NSE Stock Symbol"
-          value={profileData.companyInfo.stockSymbols.nse}
+          value={profileData?.companyInfo?.stockSymbols?.nse || ''}
           onChange={(e) =>
             setProfileData({
               ...profileData,
@@ -205,7 +240,7 @@ const UpdateCompanyProfile = () => {
         <TextField
           fullWidth
           label="Phone"
-          value={profileData.contact.phone}
+          value={profileData?.contact?.phone || ''}
           onChange={(e) =>
             handleNestedInputChange('contact', 'phone', e.target.value)
           }
@@ -214,7 +249,7 @@ const UpdateCompanyProfile = () => {
         <TextField
           fullWidth
           label="HR Email"
-          value={profileData.contact.hr}
+          value={profileData?.contact?.hr || ''}
           onChange={(e) =>
             handleNestedInputChange('contact', 'hr', e.target.value)
           }

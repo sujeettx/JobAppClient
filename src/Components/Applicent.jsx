@@ -230,7 +230,7 @@ const JobsDashboard = () => {
                                   }}
                                 >
                                   <MapPin size={16} />
-                                  {applicant.location}
+                                  {applicant?.location}
                                 </Typography>
                                 <Typography 
                                   variant="body2" 
@@ -261,7 +261,7 @@ const JobsDashboard = () => {
                                 <GraduationCap size={20} />
                                 Education
                               </Typography>
-                              {applicant.education[0] && (
+                              {applicant?.education[0] && (
                                 <Box sx={{ pl: 0.5 }}>
                                   <Typography variant="body2" fontWeight={500}>
                                     {applicant.education[0].degree}
@@ -281,7 +281,7 @@ const JobsDashboard = () => {
                                 Skills
                               </Typography>
                               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                {applicant.skills.map((skill, skillIndex) => (
+                                {applicant.skills?.map((skill, skillIndex) => (
                                   <Chip
                                     key={skillIndex}
                                     label={skill}
