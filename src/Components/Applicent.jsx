@@ -48,7 +48,7 @@ const JobsDashboard = () => {
           throw new Error('Authentication credentials not found');
         }
   
-        const response = await fetch(`http://https://job-box-server-fn4k.onrender.com/jobs/applicants/${userId}`, {
+        const response = await fetch(`https://job-box-server-fn4k.onrender.com/jobs/applicants/${userId}`, {
           headers: {
             'Authorization': token,
             'Content-Type': 'application/json'

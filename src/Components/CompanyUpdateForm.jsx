@@ -32,7 +32,7 @@ const UpdateCompanyProfile = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://https://job-box-server-fn4k.onrender.com/users/${userId}`);
+        const response = await axios.get(`https://job-box-server-fn4k.onrender.com/users/${userId}`);
         // Merge the API response with default values
         setProfileData(prevState => ({
           ...prevState,
@@ -87,7 +87,7 @@ const UpdateCompanyProfile = () => {
 
   const handleSubmit = async () => {
     try {
-      await axios.patch(`http://https://job-box-server-fn4k.onrender.com/users/${userId}`, { profile: profileData });
+      await axios.patch(`https://job-box-server-fn4k.onrender.com/users/${userId}`, { profile: profileData });
       toast.success('Company profile updated successfully!');
       setTimeout(() => { navigate('/dashboard') }, 2000)
     } catch (error) {

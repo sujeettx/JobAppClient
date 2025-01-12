@@ -56,7 +56,7 @@ const JobListings = () => {
       const companyId = localStorage.getItem("userId");
 
       const response = await fetch(
-        `http://https://job-box-server-fn4k.onrender.com/jobs/my/${companyId}`,
+        `https://job-box-server-fn4k.onrender.com/jobs/my/${companyId}`,
         {
           headers: {
             Authorization: token,
@@ -78,7 +78,7 @@ const JobListings = () => {
   const handleDelete = async (jobId) => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch(`http://https://job-box-server-fn4k.onrender.com/jobs/${jobId}`, {
+      const response = await fetch(`https://job-box-server-fn4k.onrender.com/jobs/${jobId}`, {
         method: "DELETE",
         headers: {
           Authorization: token,

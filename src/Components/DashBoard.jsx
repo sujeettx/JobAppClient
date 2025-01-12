@@ -53,7 +53,7 @@ const Dashboard = () => {
     const fetchUserData = async () => {
       try {
         const userId = localStorage.getItem('userId');
-        const response = await fetch(`http://https://job-box-server-fn4k.onrender.com/users/${userId}`);
+        const response = await fetch(`https://job-box-server-fn4k.onrender.com/users/${userId}`);
         const data = await response.json();
         setUserData(data);
       } catch (err) {

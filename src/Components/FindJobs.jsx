@@ -35,7 +35,7 @@ const GradientTitle = styled(Typography)(({ theme }) => ({
 }));
 
 const FindJobs = () => {
-  const API_URL = 'http://https://job-box-server-fn4k.onrender.com/jobs';
+  const API_URL = 'https://job-box-server-fn4k.onrender.com/jobs';
 
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);

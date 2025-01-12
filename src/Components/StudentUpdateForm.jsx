@@ -38,7 +38,7 @@ const UpdateStudentProfile = () => {
     const fetchData = async () => {
       if (!isInitialized) {
         try {
-          const response = await fetch(`http://https://job-box-server-fn4k.onrender.com/users/${userId}`);
+          const response = await fetch(`https://job-box-server-fn4k.onrender.com/users/${userId}`);
           const data = await response.json();
           
           if (isMounted) {
@@ -104,7 +104,7 @@ const UpdateStudentProfile = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch(`http://https://job-box-server-fn4k.onrender.com/users/${userId}`, {
+      const response = await fetch(`https://job-box-server-fn4k.onrender.com/users/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
