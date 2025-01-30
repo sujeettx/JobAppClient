@@ -142,7 +142,7 @@ export const JobDetails = ({ jobId, onBack, authHeader }) => {
     const fetchJobDetails = async () => {
       try {
         const response = await axios.get(
-          `https://job-box-server-fn4k.onrender.com/jobs/${jobId}`,
+          `https://jobappserver-1.onrender.com/jobs/${jobId}`,
           authHeader
         );
         setJob(response.data);
@@ -165,7 +165,7 @@ export const JobDetails = ({ jobId, onBack, authHeader }) => {
     setApplyLoading(true);
     try {
       const response = await axios.post(
-        `https://job-box-server-fn4k.onrender.com/jobs/${jobId}/apply`,
+        `https://jobappserver-1.onrender.com/jobs/${jobId}/apply`,
         {},
         authHeader
       );

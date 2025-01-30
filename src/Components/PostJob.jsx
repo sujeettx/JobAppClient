@@ -84,7 +84,7 @@ const JobPostingForm = () => {
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch('https://job-box-server-fn4k.onrender.com/jobs', {
+      const response = await fetch('https://jobappserver-1.onrender.com/jobs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -14,7 +14,7 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const handleSignUp = () => {
-    navigate('/signup');
+    navigate('/signup-company');
   };
 
   return (

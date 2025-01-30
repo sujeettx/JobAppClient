@@ -158,7 +158,7 @@ const CompanySignupPage = () => {
     setMessage('');
 
     try {
-      await axios.post('https://job-box-server-fn4k.onrender.com/users/register', formData);
+      await axios.post('https://jobappserver-1.onrender.com/users/register', formData);
       setMessage('Registration successful! Redirecting to login...');
       setIsSuccess(true);
       setFormData(initialFormState);
